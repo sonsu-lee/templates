@@ -9,9 +9,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "typecheck": "next typegen && tsc --noEmit",
-    "lint": "oxlint .",
-    "lint:fix": "oxlint . --fix",
+    "lint": "next typegen && oxlint .",
+    "lint:fix": "next typegen && oxlint . --fix",
     "format": "oxfmt --write .",
     "format:check": "oxfmt --check .",
     "start": "next start"
