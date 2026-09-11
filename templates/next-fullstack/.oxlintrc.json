@@ -11,11 +11,14 @@
   },
   "options": {
     "typeAware": true,
-    "typeCheck": false
+    "typeCheck": true
   },
   "ignorePatterns": [
     "node_modules/",
-    ".next/",
+    ".next/cache/",
+    ".next/server/",
+    ".next/static/",
+    ".next/dev/",
     "out/",
     "dist/",
     "coverage/",
@@ -30,7 +33,13 @@
     "typescript/no-unsafe-assignment": "error",
     "typescript/no-unsafe-call": "error",
     "typescript/no-unsafe-member-access": "error",
-    "typescript/no-unsafe-return": "error"
+    "typescript/no-unsafe-return": "error",
+    "sort-imports": [
+      "error",
+      {
+        "ignoreDeclarationSort": true
+      }
+    ]
   },
   "overrides": [
     {
