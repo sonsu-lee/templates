@@ -1,8 +1,10 @@
 import { Injectable } from "@nestjs/common";
 
+import type { Health } from "./health.schema";
+
 @Injectable()
 export class HealthService {
-  check() {
-    return { status: "ok" } as const;
+  check(): Health {
+    return { status: "ok" };
   }
 }
