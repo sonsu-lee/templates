@@ -9,7 +9,9 @@
     "next-env.d.ts",
     "*.tsbuildinfo"
   ],
-  "sortImports": false,
+  "sortImports": {
+    "sortSideEffects": false
+  },
   "sortTailwindcss": false,
   "sortPackageJson": {
     "sortScripts": true

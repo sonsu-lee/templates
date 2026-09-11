@@ -1,6 +1,6 @@
 # next-fullstack
 
-이 디렉터리만 복사해 사용하는 개인 프로젝트 템플릿입니다. 루트의 Oxlint·Oxfmt·TypeScript 설정으로 실행됩니다. 공유 Oxlint 설정이나 외부 설정 패키지는 없습니다. ESLint CLI·설정 대신 Oxlint에서 import 정렬용 JS 플러그인을 실행합니다.
+이 디렉터리만 복사해 사용하는 개인 프로젝트 템플릿입니다. 루트의 Oxlint·Oxfmt·TypeScript 설정으로 실행됩니다. 공유 Oxlint 설정이나 외부 설정 패키지는 없습니다. ESLint·외부 lint 플러그인 없이 Oxlint 내장 규칙과 Oxfmt로 검사합니다.
 
 ## 시작
 
@@ -55,21 +55,21 @@ React Compiler의 개별 correctness 규칙과 `react/unsupported-syntax`를 켭
 
 `lint`의 warning은 표시되지만 종료 코드를 실패로 바꾸지는 않습니다. error는 실패합니다. `lint:fix`는 `--fix`만 사용하고 `--fix-suggestions`·`--fix-dangerously`를 사용하지 않습니다. 포맷과 정렬의 역할은 아래와 같습니다.
 
-`lint`와 `lint:fix`는 먼저 `next typegen`으로 생성 타입을 갱신합니다. `.next/types/validator.ts`를 별도 파일 인자로 검사해 페이지·레이아웃·Route Handler의 타입 계약도 확인합니다. 이 생성 파일에는 `-A all`로 내장 lint 규칙을, `.next/types/**` override로 import 정렬 규칙을 끄고 타입 검사만 실행하며 자동수정하지 않습니다.
+`lint`와 `lint:fix`는 먼저 `next typegen`으로 생성 타입을 갱신합니다. `.next/types/validator.ts`를 별도 파일 인자로 검사해 페이지·레이아웃·Route Handler의 타입 계약도 확인합니다. 이 생성 파일에는 `-A all`로 내장 lint 규칙을 끄고 타입 검사만 실행하며 자동수정하지 않습니다.
 
 빌드 결과·coverage·의존성·Next 생성 선언은 제외하고 애플리케이션·설정·스크립트 소스는 검사합니다. `.next/` 전체를 Oxlint에서 제외하면 validator 검사도 빠지므로 cache·server·static·dev 하위 디렉터리만 제외합니다.
 
 ## 정렬과 검증 명령
 
-- **Oxlint**: `eslint-plugin-simple-import-sort` **14.0.0**을 `jsPlugins`로 로드하고 `simple-import-sort/imports`를 error로 적용합니다. import 선언은 부수 효과 import → `node:` → 외부 패키지 → 내부·절대 경로(`@/` 포함) → 상대 경로로 그룹화하고, 그룹 내부와 named import를 정렬합니다. `require()`와 export 정렬은 이 규칙의 대상이 아닙니다.
-- **Oxfmt**: 코드 포맷과 `package.json`의 키·의존성·scripts 정렬을 담당합니다. `sortImports: false`로 import 순서를 중복 제어하지 않고, StyleX를 사용하므로 `sortTailwindcss: false`를 유지합니다. `sortPackageJson: { "sortScripts": true }`로 package.json 정렬을 켭니다.
-- **검증**: 변경 후 `pnpm check`, 전달 전 `pnpm verify`를 실행합니다. check는 소스를 자동수정하지 않으며 Next의 생성 타입은 갱신합니다. verify는 check가 성공한 뒤 빌드합니다. 자동수정은 `pnpm lint:fix && pnpm format`으로 실행한 뒤 `pnpm check`로 다시 확인합니다. 이 명령을 CI나 에이전트의 완료 조건에서 실제로 호출해야 검사가 강제됩니다.
+- **Oxlint**: 내장 `sort-imports`를 error로 적용하고 `ignoreDeclarationSort: true`로 선언 순서 검사는 끕니다. named import의 로컬 이름을 알파벳순으로 검사·자동수정합니다. `import type`으로 변환하지 않습니다. 진단의 `eslint(sort-imports)` 표기는 원본 규칙의 이름 공간이며, 실행은 Oxlint의 Rust 내장 구현이 담당합니다.
+- **Oxfmt**: 코드 포맷, import 선언·그룹 정렬, `package.json`의 키·의존성·scripts 정렬을 담당합니다. `sortImports: { "sortSideEffects": false }`로 부수 효과 import 정렬을 끄고, 내장 기본 그룹과 내부 경로 식별(`@/` 포함)을 사용합니다. StyleX를 사용하므로 `sortTailwindcss: false`를 유지합니다. `sortPackageJson: { "sortScripts": true }`로 package.json 정렬을 켭니다.
+- **검증**: 변경 후 `pnpm check`, 전달 전 `pnpm verify`를 실행합니다. check는 소스를 자동수정하지 않으며 Next의 생성 타입은 갱신합니다. named import 위반은 lint 오류로, 선언·그룹 정렬 위반은 format:check 실패로 검출됩니다. verify는 check가 성공한 뒤 빌드합니다. 자동수정은 `pnpm lint:fix && pnpm format` 후 `pnpm check`로 확인합니다. 이 명령을 CI나 에이전트의 완료 조건에서 실제로 호출해야 검사가 강제됩니다.
 
-정렬 플러그인은 TS compiler API를 사용하지 않습니다. ESLint는 플러그인의 peer 의존성으로 설치되지만 lint 실행기는 Oxlint 하나입니다. 별도의 ESLint 설정·명령·TypeScript parser는 추가하지 않습니다. JS 플러그인 로딩에는 Node가 필요합니다.
+ESLint 본체·ESLint 플러그인·JS 플러그인 로더는 사용하지 않습니다. 각 앱은 Oxlint와 Oxfmt 설정을 직접 소유합니다.
 
-`import "server-only"`, `import "reflect-metadata"`, CSS 같은 부수 효과 import끼리의 기존 순서는 보존합니다. 다만 그룹 정렬은 이들을 일반 import보다 앞으로 이동시킬 수 있습니다. 모듈 초기화가 특정 import 순서에 의존하는 파일은 해당 import 묶음에 `/* oxlint-disable simple-import-sort/imports -- 초기화 순서 유지 사유 */`와 `/* oxlint-enable simple-import-sort/imports */`를 사용해 좁게 제외합니다. import 정렬은 실행 순서의 안전성을 증명하지 않습니다. Nest DI에 필요한 런타임 클래스 import를 `import type`으로 바꾸지 않습니다.
+`import "server-only"`, `import "reflect-metadata"`, CSS 같은 부수 효과 import끼리의 기존 순서는 보존합니다. 일반 import는 이를 넘어 재배치될 수 있으므로 초기화 순서에 의존하는 import 묶음은 각 import 앞에 `// oxfmt-ignore`를 붙여 정렬에서 제외합니다. named import 이름의 순서만 예외로 둘 때는 `// oxlint-disable-next-line sort-imports -- 예외 사유`를 사용합니다.
 
-[정렬 규칙과 부수 효과 import](https://github.com/lydell/eslint-plugin-simple-import-sort#sort-order), [Oxlint JS 플러그인](https://oxc.rs/docs/guide/usage/linter/js-plugins)을 참고하세요.
+[Oxlint 내장 sort-imports](https://oxc.rs/docs/guide/usage/linter/rules/eslint/sort-imports.html), [Oxfmt 정렬](https://oxc.rs/docs/guide/usage/formatter/sorting.html)을 참고하세요.
 
 ## 에디터
 

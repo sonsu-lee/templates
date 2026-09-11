@@ -34,7 +34,12 @@
     "typescript/no-unsafe-call": "error",
     "typescript/no-unsafe-member-access": "error",
     "typescript/no-unsafe-return": "error",
-    "simple-import-sort/imports": "error"
+    "sort-imports": [
+      "error",
+      {
+        "ignoreDeclarationSort": true
+      }
+    ]
   },
   "overrides": [
     {
@@ -244,13 +249,6 @@
         "node": true,
         "browser": false
       }
-    },
-    {
-      "files": [".next/types/**"],
-      "rules": {
-        "simple-import-sort/imports": "off"
-      }
     }
-  ],
-  "jsPlugins": ["eslint-plugin-simple-import-sort"]
+  ]
 }

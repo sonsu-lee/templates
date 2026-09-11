@@ -16,7 +16,12 @@
   "ignorePatterns": ["node_modules/", ".next/", "out/", "dist/", "coverage/", "*.tsbuildinfo"],
   "rules": {
     "typescript/consistent-type-imports": "off",
-    "simple-import-sort/imports": "error"
+    "sort-imports": [
+      "error",
+      {
+        "ignoreDeclarationSort": true
+      }
+    ]
   },
   "overrides": [
     {
@@ -26,6 +31,5 @@
         "unicorn/no-process-exit": "error"
       }
     }
-  ],
-  "jsPlugins": ["eslint-plugin-simple-import-sort"]
+  ]
 }

@@ -70,7 +70,12 @@
       }
     ],
     "typescript/no-require-imports": "error",
-    "simple-import-sort/imports": "error"
+    "sort-imports": [
+      "error",
+      {
+        "ignoreDeclarationSort": true
+      }
+    ]
   },
   "overrides": [
     {
@@ -317,13 +322,6 @@
         "node": true,
         "browser": false
       }
-    },
-    {
-      "files": [".next/types/**"],
-      "rules": {
-        "simple-import-sort/imports": "off"
-      }
     }
-  ],
-  "jsPlugins": ["eslint-plugin-simple-import-sort"]
+  ]
 }
