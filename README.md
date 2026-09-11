@@ -15,10 +15,8 @@ pnpm dev
 
 Node 24.21.0과 pnpm 12.3.4를 사용합니다. 웹은 `http://localhost:3000`, 헬스체크는 `http://localhost:3000/api/health`에서 확인합니다.
 
-## 구성과 검증
+## 구성
 
 템플릿은 Oxlint·Oxfmt·TypeScript 설정, 의존성과 잠금 파일, 실행 명령과 에디터 설정을 직접 소유합니다. 공통 lint 설정을 상속하지 않습니다. Next는 TS7 타입 기반 lint를 사용하고, 예제는 첫 화면과 HTTP 헬스체크만 제공합니다.
-
-[검증 fixture](tests/fixtures/next-all-in-one/README.md)는 관리 저장소에만 있으며 프로젝트를 복사할 때 포함되지 않습니다. [검증 기록](docs/next-all-in-one-verification.md)에 실행 환경과 결과, 미검증 범위를 남깁니다.
 
 Next + Nest 템플릿, Rust CLI, 공통 검증 실행기·CI와 릴리스 배포는 별도 이슈에서 다룹니다.

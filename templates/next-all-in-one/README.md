@@ -4,7 +4,7 @@
 
 ## 시작
 
-Node **24.21.0**, pnpm **12.3.4**를 사용합니다. `.node-version`과 `packageManager`에 고정되어 있습니다.
+Node **24.21.0**, pnpm **12.3.4**를 사용합니다. `.node-version`과 `packageManager`에 고정되어 있습니다. `pnpm-workspace.yaml`의 `saveExact: true`는 새로 추가하는 의존성도 정확한 버전으로 저장합니다.
 
 ```sh
 pnpm install --frozen-lockfile
@@ -59,4 +59,4 @@ CLI와 LSP는 같은 앱의 `.oxlintrc.json`을 읽습니다. schema는 `./node_
 - [React Compiler 규칙](https://oxc.rs/blog/2026-08-18-react-compiler-support), [Next 서버·클라이언트 경계](https://nextjs.org/docs/app/getting-started/server-and-client-components), [정적 export](https://nextjs.org/docs/app/guides/static-exports)
 - [LSP 폴더별 설정](https://oxc.rs/docs/guide/usage/linter/lsp-config-reference.html)
 
-버전 변경 시 이 템플릿을 단독 설치하고 lint·타입 검사·빌드·헬스체크를 다시 실행합니다. 관리 저장소의 fixture로 정상 코드 통과와 의도한 위반 실패를 확인합니다. 이 README의 범위 밖인 공식 규칙·DB·배포·실제 에디터 UI 동작까지 검증됐다고 해석하지 않습니다.
+버전 변경 시 이 템플릿을 단독 설치하고 lint·타입 검사·빌드·헬스체크를 다시 실행합니다. 이 README의 범위 밖인 공식 규칙·DB·배포·실제 에디터 UI 동작까지 검증됐다고 해석하지 않습니다.
