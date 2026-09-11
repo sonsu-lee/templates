@@ -1,5 +1,6 @@
 "use client";
 
+import * as stylex from "@stylexjs/stylex";
 import { useState } from "react";
 
 export function HealthCheck() {
@@ -31,6 +32,7 @@ export function HealthCheck() {
   return (
     <section aria-label="Health check">
       <button
+        {...stylex.props(styles.button)}
         disabled={pending}
         onClick={() => {
           void checkHealth();
@@ -44,3 +46,7 @@ export function HealthCheck() {
     </section>
   );
 }
+
+const styles = stylex.create({
+  button: { font: "inherit", padding: "0.5rem 1rem" },
+});

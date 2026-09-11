@@ -1,3 +1,4 @@
+import * as stylex from "@stylexjs/stylex";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
@@ -10,7 +11,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body {...stylex.props(styles.body)}>{children}</body>
     </html>
   );
 }
+
+const styles = stylex.create({
+  body: { fontFamily: "system-ui, sans-serif", margin: 0, padding: "3rem 1.5rem", lineHeight: 1.6 },
+});

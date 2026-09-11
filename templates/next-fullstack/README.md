@@ -32,6 +32,16 @@ pnpm dev
 - `src`의 요청 처리 코드에는 `node/no-sync`, `unicorn/no-process-exit`가 적용됩니다. 개발·마이그레이션 실행 코드는 `scripts/` 또는 루트 설정 파일에 둡니다.
 - 설정 파일과 `scripts/`도 일반 lint 대상입니다. 앱의 React·Next·접근성 규칙은 `src/**`에 적용합니다.
 
+## 스타일
+
+StyleX 0.19.0을 사용합니다. 컴포넌트 옆에서 `stylex.create`로 스타일을 정의하고 `stylex.props`로 적용합니다. `globals.css`는 생성된 CSS를 삽입하는 `@stylex` 진입점입니다.
+
+Babel은 JS/TS의 StyleX 호출을 변환하고 PostCSS는 `src/**`에서 CSS를 추출합니다. 두 설정은 같은 StyleX 변환 옵션을 사용하며 `@/`는 `src/`를 가리킵니다. Next의 기본 Turbopack 개발·빌드를 사용합니다. 스타일 파일은 검사 범위인 `src/` 아래에 둡니다.
+
+StyleX 전용 ESLint 플러그인은 포함하지 않습니다. 기존 Oxlint와 TypeScript 검사를 유지하며, StyleX의 `valid-styles` 같은 전용 lint 규칙을 제공하지는 않습니다.
+
+[StyleX 공식 Next.js 설정](https://stylexjs.com/docs/learn/installation/nextjs)을 기준으로 구성했습니다.
+
 ## Lint 정책과 한계
 
 Oxlint **1.82.0**, Oxfmt **0.67.0**, Next **16.3.4**, React **19.3.0**, 웹 TypeScript **7.0.2**, `oxlint-tsgolint` **7.0.2001**에 고정되어 있습니다. `tsgolint`는 TS7.0.2 엔진을 사용합니다.

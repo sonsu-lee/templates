@@ -17,6 +17,6 @@ Node 24.21.0과 pnpm 12.3.4를 사용합니다. 웹은 `http://localhost:3000`, 
 
 ## 구성
 
-템플릿은 Oxlint·Oxfmt·TypeScript 설정, 의존성과 잠금 파일, 실행 명령과 에디터 설정을 직접 소유합니다. 공통 lint 설정을 상속하지 않습니다. Next는 TS7 타입 기반 lint를 사용하고, 예제는 첫 화면과 HTTP 헬스체크만 제공합니다.
+템플릿은 Oxlint·Oxfmt·TypeScript 설정, 의존성과 잠금 파일, 실행 명령과 에디터 설정을 직접 소유합니다. 공통 lint 설정을 상속하지 않습니다. Next는 StyleX와 TS7 타입 기반 lint를 사용하고, 예제는 첫 화면과 HTTP 헬스체크만 제공합니다.
 
 Next + Nest 템플릿, Rust CLI, 공통 검증 실행기·CI와 릴리스 배포는 별도 이슈에서 다룹니다.
