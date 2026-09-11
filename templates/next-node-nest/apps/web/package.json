@@ -7,8 +7,8 @@
     "dev": "next dev",
     "format": "oxfmt --write .",
     "format:check": "oxfmt --check .",
-    "lint": "next typegen && oxlint . && oxlint -A all .next/types/validator.ts",
-    "lint:fix": "next typegen && oxlint . --fix && oxlint -A all .next/types/validator.ts",
+    "lint": "next typegen && oxlint .",
+    "lint:fix": "next typegen && oxlint . --fix",
     "start": "next start"
   },
   "dependencies": {

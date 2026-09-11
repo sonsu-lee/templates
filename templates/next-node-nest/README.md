@@ -43,7 +43,7 @@ API의 `.env.example`은 자동 로딩하지 않습니다. 컨테이너에서는
 
 ## 개발 규칙
 
-- [웹](apps/web/README.md)은 StyleX·TS7과 타입 기반 Oxlint를 사용합니다. Next 생성 validator도 타입 검사에 포함하며 자동수정하지 않습니다.
+- [웹](apps/web/README.md)은 StyleX·TS7과 타입 기반 Oxlint를 사용합니다. Next 생성 타입을 통한 Route Handler 등의 계약 검증은 `pnpm build`에서 수행합니다.
 - [API](apps/api/README.md)는 Nest 컴파일러 호환성을 위해 TS6을 사용합니다. 일반 lint와 타입 검사를 분리하고 DI에 필요한 런타임 클래스 import를 유지합니다.
 - 데이터 접근은 Nest가 담당합니다. 웹에서 Nest 구현·DB 모듈 직접 import와 `require()`를 제한하며 Next 서버도 HTTP로 API를 호출합니다.
 - Client Component는 `src/client/**` 또는 `src/**/*.client.*`에 둡니다. 서버 코드는 `src/server/**`와 `import "server-only"`를 사용합니다. Next가 내부 처리하므로 npm 패키지는 설치하지 않습니다. [Next 공식 설명](https://nextjs.org/docs/app/getting-started/server-and-client-components#preventing-environment-poisoning)

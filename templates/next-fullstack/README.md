@@ -33,7 +33,7 @@ pnpm dev
 
 ## 검사와 에디터
 
-TS7 타입 검사와 Promise·React·Hooks·접근성 검사는 Oxlint가 담당합니다. Next 생성 validator도 타입 검사에 포함하며 자동수정하지 않습니다. 설정·스크립트는 검사하고 빌드 결과는 제외합니다.
+TS7 타입 검사와 Promise·React·Hooks·접근성 검사는 Oxlint가 담당합니다. Next 생성 타입을 통한 Route Handler 등의 계약 검증은 `pnpm build`에서 수행합니다. 설정·스크립트는 검사하고 빌드 결과는 제외합니다.
 
 named import 정렬은 Oxlint, import 선언·그룹·package.json 정렬과 포맷은 Oxfmt가 담당합니다. ESLint·외부 lint 플러그인은 사용하지 않습니다. 초기화 순서가 중요한 import 묶음은 각 import 앞에 `// oxfmt-ignore`를 붙입니다.
 
