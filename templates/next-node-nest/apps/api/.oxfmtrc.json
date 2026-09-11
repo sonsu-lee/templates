@@ -11,5 +11,7 @@
   ],
   "sortImports": false,
   "sortTailwindcss": false,
-  "sortPackageJson": false
+  "sortPackageJson": {
+    "sortScripts": true
+  }
 }

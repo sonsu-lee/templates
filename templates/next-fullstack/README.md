@@ -1,6 +1,6 @@
 # next-fullstack
 
-이 디렉터리만 복사해 사용하는 개인 프로젝트 템플릿입니다. 루트의 Oxlint·Oxfmt·TypeScript 설정으로 실행됩니다. 공유 Oxlint 설정, 외부 설정 패키지, ESLint는 없습니다.
+이 디렉터리만 복사해 사용하는 개인 프로젝트 템플릿입니다. 루트의 Oxlint·Oxfmt·TypeScript 설정으로 실행됩니다. 공유 Oxlint 설정이나 외부 설정 패키지는 없습니다. ESLint CLI·설정 대신 Oxlint에서 import 정렬용 JS 플러그인을 실행합니다.
 
 ## 시작
 
@@ -13,14 +13,15 @@ pnpm dev
 
 웹: <http://localhost:3000>. 헬스체크: <http://localhost:3000/api/health>. 첫 화면의 버튼으로 실제 응답을 확인합니다. 헬스체크는 프로세스와 HTTP 라우팅을 확인하며 DB readiness 검사는 포함하지 않습니다. 도메인 예제·DB 스키마·ORM 의존성은 추가하지 않았습니다.
 
-| 명령                | 동작                            |
-| ------------------- | ------------------------------- |
-| `pnpm lint`         | 파일을 수정하지 않는 lint       |
-| `pnpm lint:fix`     | Oxlint의 안전한 자동수정만 실행 |
-| `pnpm typecheck`    | `next typegen && tsc --noEmit`  |
-| `pnpm build`        | Next 프로덕션 빌드              |
-| `pnpm format:check` | Oxfmt 형식 검사                 |
-| `pnpm format`       | Oxfmt 포맷 적용                 |
+| 명령                | 동작                                          |
+| ------------------- | --------------------------------------------- |
+| `pnpm check`        | lint·타입 검사·포맷 검사                      |
+| `pnpm verify`       | check 후 Next 프로덕션 빌드                   |
+| `pnpm lint`         | Next 타입 생성 후 lint·타입 검사              |
+| `pnpm lint:fix`     | Oxlint 자동수정 후 생성된 Next 타입 계약 검사 |
+| `pnpm build`        | Next 프로덕션 빌드                            |
+| `pnpm format:check` | Oxfmt 형식·package.json 정렬 검사             |
+| `pnpm format`       | Oxfmt 포맷·package.json 정렬 적용             |
 
 빌드 후 `pnpm start`로 웹 서버를 시작합니다.
 
@@ -46,15 +47,29 @@ StyleX 전용 ESLint 플러그인은 포함하지 않습니다. 기존 Oxlint와
 
 Oxlint **1.82.0**, Oxfmt **0.67.0**, Next **16.3.4**, React **19.3.0**, 웹 TypeScript **7.0.2**, `oxlint-tsgolint` **7.0.2001**에 고정되어 있습니다. `tsgolint`는 TS7.0.2 엔진을 사용합니다.
 
-웹은 `options.typeAware: true`, `typeCheck: false`입니다. JS·TS·Oxc·Unicorn·import correctness에 React·Hooks·접근성을 추가합니다. `no-floating-promises`, `no-misused-promises`, `await-thenable`, unsafe 계열을 검사하며 타입 오류는 별도의 `typecheck`와 빌드가 검사합니다. Next 필수 default export는 허용합니다. `all` 카테고리는 사용하지 않습니다.
+웹은 `options.typeAware: true`, `typeCheck: true`입니다. JS·TS·Oxc·Unicorn·import correctness에 React·Hooks·접근성을 추가합니다. `no-floating-promises`, `no-misused-promises`, `await-thenable`, unsafe 계열을 검사하며 타입 오류도 lint에서 검사합니다. 별도의 `tsc --noEmit` 명령은 두지 않으며 빌드의 타입 검사도 유지합니다. Next 필수 default export는 허용합니다. `all` 카테고리는 사용하지 않습니다.
 
-Next 플러그인의 공식 권장 규칙 22개 중 Oxlint 내장 대응 규칙 **21개**를 원래 severity로 명시하고, Core Web Vitals의 `no-html-link-for-pages`, `no-sync-scripts`를 error로 강화했습니다. **`no-location-assign-relative-destination`은 내장 구현이 없어 검사하지 않습니다.** 이 비교는 Next 전용 플러그인에 한정되며 `eslint-config-next` 전체와 동등하다는 의미가 아닙니다. JS 플러그인은 설치하지 않습니다.
+Next 플러그인의 공식 권장 규칙 22개 중 Oxlint 내장 대응 규칙 **21개**를 원래 severity로 명시하고, Core Web Vitals의 `no-html-link-for-pages`, `no-sync-scripts`를 error로 강화했습니다. **`no-location-assign-relative-destination`은 내장 구현이 없어 검사하지 않습니다.** 이 비교는 Next 전용 플러그인에 한정되며 `eslint-config-next` 전체와 동등하다는 의미가 아닙니다. Next 전용 JS 플러그인은 설치하지 않습니다.
 
 React Compiler의 개별 correctness 규칙과 `react/unsupported-syntax`를 켭니다. 제거된 `react/react-compiler`는 사용하지 않습니다. Oxlint의 compiler 규칙은 실험적이며 공식 React 플러그인의 `config`, `gating`까지 제공하지 않습니다. compiler lint 활성화 자체가 Next의 React Compiler 변환을 켜는 것은 아닙니다.
 
-`lint`의 warning은 표시되지만 종료 코드를 실패로 바꾸지는 않습니다. error는 실패합니다. `lint:fix`는 `--fix`만 사용하고 `--fix-suggestions`·`--fix-dangerously`를 사용하지 않습니다. 포맷은 Oxfmt가 맡으며 import 정렬·Tailwind 정렬은 끕니다.
+`lint`의 warning은 표시되지만 종료 코드를 실패로 바꾸지는 않습니다. error는 실패합니다. `lint:fix`는 `--fix`만 사용하고 `--fix-suggestions`·`--fix-dangerously`를 사용하지 않습니다. 포맷과 정렬의 역할은 아래와 같습니다.
 
-생성물 `.next`, `out`, `dist`, `coverage`, `node_modules`, `next-env.d.ts`, `*.tsbuildinfo`는 제외합니다. 생성 전 예제와 실행 스크립트는 제외하지 않습니다.
+`lint`와 `lint:fix`는 먼저 `next typegen`으로 생성 타입을 갱신합니다. `.next/types/validator.ts`를 별도 파일 인자로 검사해 페이지·레이아웃·Route Handler의 타입 계약도 확인합니다. 이 생성 파일에는 `-A all`로 내장 lint 규칙을, `.next/types/**` override로 import 정렬 규칙을 끄고 타입 검사만 실행하며 자동수정하지 않습니다.
+
+빌드 결과·coverage·의존성·Next 생성 선언은 제외하고 애플리케이션·설정·스크립트 소스는 검사합니다. `.next/` 전체를 Oxlint에서 제외하면 validator 검사도 빠지므로 cache·server·static·dev 하위 디렉터리만 제외합니다.
+
+## 정렬과 검증 명령
+
+- **Oxlint**: `eslint-plugin-simple-import-sort` **14.0.0**을 `jsPlugins`로 로드하고 `simple-import-sort/imports`를 error로 적용합니다. import 선언은 부수 효과 import → `node:` → 외부 패키지 → 내부·절대 경로(`@/` 포함) → 상대 경로로 그룹화하고, 그룹 내부와 named import를 정렬합니다. `require()`와 export 정렬은 이 규칙의 대상이 아닙니다.
+- **Oxfmt**: 코드 포맷과 `package.json`의 키·의존성·scripts 정렬을 담당합니다. `sortImports: false`로 import 순서를 중복 제어하지 않고, StyleX를 사용하므로 `sortTailwindcss: false`를 유지합니다. `sortPackageJson: { "sortScripts": true }`로 package.json 정렬을 켭니다.
+- **검증**: 변경 후 `pnpm check`, 전달 전 `pnpm verify`를 실행합니다. check는 소스를 자동수정하지 않으며 Next의 생성 타입은 갱신합니다. verify는 check가 성공한 뒤 빌드합니다. 자동수정은 `pnpm lint:fix && pnpm format`으로 실행한 뒤 `pnpm check`로 다시 확인합니다. 이 명령을 CI나 에이전트의 완료 조건에서 실제로 호출해야 검사가 강제됩니다.
+
+정렬 플러그인은 TS compiler API를 사용하지 않습니다. ESLint는 플러그인의 peer 의존성으로 설치되지만 lint 실행기는 Oxlint 하나입니다. 별도의 ESLint 설정·명령·TypeScript parser는 추가하지 않습니다. JS 플러그인 로딩에는 Node가 필요합니다.
+
+`import "server-only"`, `import "reflect-metadata"`, CSS 같은 부수 효과 import끼리의 기존 순서는 보존합니다. 다만 그룹 정렬은 이들을 일반 import보다 앞으로 이동시킬 수 있습니다. 모듈 초기화가 특정 import 순서에 의존하는 파일은 해당 import 묶음에 `/* oxlint-disable simple-import-sort/imports -- 초기화 순서 유지 사유 */`와 `/* oxlint-enable simple-import-sort/imports */`를 사용해 좁게 제외합니다. import 정렬은 실행 순서의 안전성을 증명하지 않습니다. Nest DI에 필요한 런타임 클래스 import를 `import type`으로 바꾸지 않습니다.
+
+[정렬 규칙과 부수 효과 import](https://github.com/lydell/eslint-plugin-simple-import-sort#sort-order), [Oxlint JS 플러그인](https://oxc.rs/docs/guide/usage/linter/js-plugins)을 참고하세요.
 
 ## 에디터
 

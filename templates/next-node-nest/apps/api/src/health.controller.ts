@@ -1,6 +1,7 @@
 import { Controller, Get, SerializeOptions } from "@nestjs/common";
 import { ApiOkResponse } from "@nestjs/swagger";
-import { healthSchema, type Health } from "./health.schema";
+
+import { type Health, healthSchema } from "./health.schema";
 import { HealthService } from "./health.service";
 
 @Controller("health")

@@ -1,9 +1,10 @@
 import {
   Module,
-  StandardSchemaValidationPipe,
   StandardSchemaSerializerInterceptor,
+  StandardSchemaValidationPipe,
 } from "@nestjs/common";
-import { APP_PIPE, APP_INTERCEPTOR } from "@nestjs/core";
+import { APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
+
 import { HealthController } from "./health.controller";
 import { HealthService } from "./health.service";
 

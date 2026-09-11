@@ -1,4 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
+
 import { HealthCheck } from "@/client/health-check";
 
 export default function Home() {

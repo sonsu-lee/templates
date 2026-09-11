@@ -1,6 +1,6 @@
 # next-node-nest
 
-Next.js Node 서버와 NestJS API를 함께 사용하는 pnpm workspace입니다. 이 디렉터리만 복사해 설치합니다. 웹과 API는 각각 Oxlint·Oxfmt·TypeScript 설정과 의존성을 소유합니다. 공통 Oxlint 설정·Turbo·ESLint·DB·ORM은 포함하지 않습니다.
+Next.js Node 서버와 NestJS API를 함께 사용하는 pnpm workspace입니다. 이 디렉터리만 복사해 설치합니다. 웹과 API는 각각 Oxlint·Oxfmt·TypeScript 설정과 의존성을 소유합니다. 공통 Oxlint 설정·Turbo·DB·ORM은 포함하지 않습니다. ESLint CLI·설정 대신 각 앱의 Oxlint에서 import 정렬용 JS 플러그인을 실행합니다.
 
 ## 시작
 
@@ -13,15 +13,17 @@ pnpm dev
 
 웹은 <http://localhost:3000>, Nest 헬스체크는 <http://localhost:8080/health>입니다. 버튼은 Next `/api/health`를 호출하고 Next 서버가 Nest `/health`를 호출합니다. Nest 연결 실패·오류·잘못된 응답은 원인을 Next 서버 로그에 기록하고 502로 반환하며 제한 시간은 5초입니다. 헬스체크는 프로세스·HTTP·constructor DI만 확인하며 DB readiness는 검사하지 않습니다.
 
-| 명령                | 동작                                 |
-| ------------------- | ------------------------------------ |
-| `pnpm dev`          | 두 앱의 개발 서버 실행               |
-| `pnpm build`        | Next와 Nest 빌드                     |
-| `pnpm typecheck`    | API TS6 타입 검사 (웹은 lint에 포함) |
-| `pnpm lint`         | 앱별 작업 디렉터리에서 독립 lint     |
-| `pnpm lint:fix`     | 앱별 안전한 자동수정                 |
-| `pnpm format:check` | 앱·루트 문서·설정 포맷 검사          |
-| `pnpm format`       | Oxfmt 포맷 적용                      |
+| 명령                | 동작                                                      |
+| ------------------- | --------------------------------------------------------- |
+| `pnpm check`        | 앱별 lint·웹 타입 검사, API TS6 타입 검사, 전체 포맷 검사 |
+| `pnpm verify`       | check 후 Next와 Nest 빌드                                 |
+| `pnpm dev`          | 두 앱의 개발 서버 실행                                    |
+| `pnpm build`        | Next와 Nest 빌드                                          |
+| `pnpm typecheck`    | API TS6 타입 검사 (웹은 lint에 포함)                      |
+| `pnpm lint`         | 앱별 작업 디렉터리에서 독립 lint                          |
+| `pnpm lint:fix`     | 앱별 안전한 자동수정                                      |
+| `pnpm format:check` | 앱·루트 문서·설정 포맷 검사                               |
+| `pnpm format`       | Oxfmt 포맷·package.json 정렬 적용                         |
 
 빌드 후 별도 터미널에서 `pnpm --dir apps/api start`와 `pnpm --dir apps/web start`를 실행합니다. 빌드 시 Nest가 실행 중일 필요는 없습니다.
 
@@ -40,13 +42,25 @@ pnpm dev
 - 웹 Client Component는 `src/client/**` 또는 `src/**/*.client.*`에 둡니다. 여기서 Node·서버 모듈 직접 import를 금지합니다. 서버는 `src/server/`와 `server-only`를 사용합니다. `env`만으로 실제 서버·클라이언트 경계를 검증할 수 없으며 경로 규약 밖의 Client Component와 전이 import는 Next 빌드에서도 확인해야 합니다.
 - 서버 소스는 동기 I/O와 직접 `process.exit()`를 제한합니다. 개발 스크립트는 `scripts/`에 두며 웹에서는 ESM import를 사용합니다.
 - API의 `typescript/consistent-type-imports`는 끕니다. DI 클래스의 런타임 import와 `experimentalDecorators`·`emitDecoratorMetadata`를 유지합니다.
-- `all` 카테고리는 사용하지 않습니다. warning은 lint를 실패시키지 않으며 `lint:fix`는 `--fix`만 사용합니다. 빌드 결과·coverage·Next 생성 선언은 제외하고 설정·스크립트 소스는 검사합니다. 웹 lint는 `next typegen`이 생성하는 `.next/types/validator.ts`를 명시적으로 포함해 페이지·레이아웃·Route Handler의 타입 계약도 검사합니다. 생성 파일에는 `-A all`로 lint 규칙을 끄고 타입 검사만 실행하며 자동수정하지 않습니다. `.next/` 전체를 Oxlint에서 제외하면 이 검사까지 빠지므로 cache·server·static·dev 하위 디렉터리를 제외합니다.
+- `all` 카테고리는 사용하지 않습니다. warning은 lint를 실패시키지 않으며 `lint:fix`는 `--fix`만 사용합니다. 빌드 결과·coverage·Next 생성 선언은 제외하고 설정·스크립트 소스는 검사합니다. 웹 lint는 `next typegen`이 생성하는 `.next/types/validator.ts`를 명시적으로 포함해 페이지·레이아웃·Route Handler의 타입 계약도 검사합니다. 생성 파일에는 `-A all`로 내장 lint 규칙을, `.next/types/**` override로 import 정렬 규칙을 끄고 타입 검사만 실행하며 자동수정하지 않습니다. `.next/` 전체를 Oxlint에서 제외하면 이 검사까지 빠지므로 cache·server·static·dev 하위 디렉터리를 제외합니다.
 
 웹은 React·Hooks·접근성·Next 내장 규칙을 적용합니다. Next 권장 규칙 22개 중 Oxlint 대응 규칙 21개를 명시하고 Core Web Vitals 링크·동기 스크립트 규칙은 error입니다. `no-location-assign-relative-destination`은 내장 구현이 없어 검사하지 않습니다. `eslint-config-next` 전체와 동등하지 않습니다. React Compiler 개별 correctness 규칙과 `unsupported-syntax`를 사용하지만 미구현 `config`·`gating` 검사나 Compiler 변환 활성화를 제공하지 않습니다.
 
+## 정렬과 검증 명령
+
+- **Oxlint**: `eslint-plugin-simple-import-sort` **14.0.0**을 `jsPlugins`로 로드하고 `simple-import-sort/imports`를 error로 적용합니다. import 선언은 부수 효과 import → `node:` → 외부 패키지 → 내부·절대 경로(`@/` 포함) → 상대 경로로 그룹화하고, 그룹 내부와 named import를 정렬합니다. `require()`와 export 정렬은 이 규칙의 대상이 아닙니다.
+- **Oxfmt**: 코드 포맷과 `package.json`의 키·의존성·scripts 정렬을 담당합니다. `sortImports: false`로 import 순서를 중복 제어하지 않고, StyleX를 사용하므로 `sortTailwindcss: false`를 유지합니다. `sortPackageJson: { "sortScripts": true }`로 package.json 정렬을 켭니다.
+- **검증**: 변경 후 `pnpm check`, 전달 전 `pnpm verify`를 실행합니다. check는 소스를 자동수정하지 않으며 Next의 생성 타입은 갱신합니다. verify는 check가 성공한 뒤 빌드합니다. 자동수정은 `pnpm lint:fix && pnpm format`으로 실행한 뒤 `pnpm check`로 다시 확인합니다. 이 명령을 CI나 에이전트의 완료 조건에서 실제로 호출해야 검사가 강제됩니다.
+
+정렬 플러그인은 TS compiler API를 사용하지 않습니다. ESLint는 플러그인의 peer 의존성으로 설치되지만 lint 실행기는 Oxlint 하나입니다. 별도의 ESLint 설정·명령·TypeScript parser는 추가하지 않습니다. JS 플러그인 로딩에는 Node가 필요합니다.
+
+`import "server-only"`, `import "reflect-metadata"`, CSS 같은 부수 효과 import끼리의 기존 순서는 보존합니다. 다만 그룹 정렬은 이들을 일반 import보다 앞으로 이동시킬 수 있습니다. 모듈 초기화가 특정 import 순서에 의존하는 파일은 해당 import 묶음에 `/* oxlint-disable simple-import-sort/imports -- 초기화 순서 유지 사유 */`와 `/* oxlint-enable simple-import-sort/imports */`를 사용해 좁게 제외합니다. import 정렬은 실행 순서의 안전성을 증명하지 않습니다. Nest DI에 필요한 런타임 클래스 import를 `import type`으로 바꾸지 않습니다.
+
+[정렬 규칙과 부수 효과 import](https://github.com/lydell/eslint-plugin-simple-import-sort#sort-order), [Oxlint JS 플러그인](https://oxc.rs/docs/guide/usage/linter/js-plugins)을 참고하세요.
+
 ## 스타일과 에디터
 
-웹은 **StyleX 0.19.0**의 `stylex.create`와 `stylex.props`로 스타일을 적용합니다. Babel과 PostCSS가 동일한 변환 옵션을 사용하고 `globals.css`의 `@stylex`에 CSS를 생성합니다. 스타일 파일은 `apps/web/src/`에 둡니다. 기본 Turbopack 개발·빌드를 유지하며 StyleX 전용 ESLint 규칙은 포함하지 않습니다. import·Tailwind 정렬도 추가하지 않습니다.
+웹은 **StyleX 0.19.0**의 `stylex.create`와 `stylex.props`로 스타일을 적용합니다. Babel과 PostCSS가 동일한 변환 옵션을 사용하고 `globals.css`의 `@stylex`에 CSS를 생성합니다. 스타일 파일은 `apps/web/src/`에 둡니다. 기본 Turbopack 개발·빌드를 유지하며 StyleX 전용 ESLint 규칙은 포함하지 않습니다. Tailwind 정렬은 사용하지 않습니다.
 
 `project.code-workspace`를 열면 web과 api가 별도 폴더가 됩니다. [Oxc 확장](https://marketplace.visualstudio.com/items?itemName=oxc.oxc-vscode)의 폴더별 설정에서 웹만 타입 기반 lint를 사용합니다. 전체 workspace에 `oxc.typeAware`를 강제하지 않습니다. 각 schema는 해당 앱의 `./node_modules/oxlint/configuration_schema.json`입니다. 루트에서 Oxlint를 직접 실행하지 말고 `pnpm lint`로 앱별 명령을 호출합니다.
 
