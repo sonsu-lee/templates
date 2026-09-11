@@ -11,7 +11,7 @@
   },
   "options": {
     "typeAware": true,
-    "typeCheck": false
+    "typeCheck": true
   },
   "ignorePatterns": [
     "node_modules/",

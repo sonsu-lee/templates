@@ -35,7 +35,7 @@ pnpm dev
 
 [웹](apps/web/README.md)은 Next **16.3.4**, React **19.3.0**, TS **7.0.2**, `oxlint-tsgolint` **7.0.2001**을 사용합니다. [API](apps/api/README.md)는 Nest 런타임 **12.0.1**, CLI **12.0.0**, TS **6.0.3**을 사용합니다. 각 앱에 Oxlint **1.82.0**과 Oxfmt **0.67.0**을 포함합니다.
 
-- 웹의 `options.typeAware`는 `true`, API는 `false`입니다. `typeCheck`는 모두 끄고 별도 타입 검사를 사용합니다. Nest CLI가 JavaScript compiler API를 사용하므로 TS6을 유지합니다. 루트 TypeScript override는 없습니다. `tsc`는 미처리 Promise·Promise 오용 lint를 대신하지 않습니다.
+- 웹의 `options.typeAware`와 `options.typeCheck`는 모두 `true`로, lint 규칙과 TypeScript 오류를 함께 검사합니다. API는 둘 다 `false`이며 TS6으로 별도 타입 검사를 실행합니다. 웹의 `pnpm typecheck`도 유지하여 `next typegen`으로 Next 생성 타입을 갱신한 뒤 `tsc --noEmit`을 실행합니다. Nest CLI가 JavaScript compiler API를 사용하므로 TS6을 유지합니다. 루트 TypeScript override는 없습니다. `tsc`는 미처리 Promise·Promise 오용 lint를 대신하지 않습니다.
 - 웹 전체에서 Nest 구현, API 소스·빌드 결과, Drizzle·Kysely·대표 DB 드라이버 직접 import와 `require()`를 제한합니다. 서버도 HTTP로 Nest에 접근합니다. 새 패키지·별칭을 추가하면 목록을 갱신합니다. 계산된 동적 import와 임의 별칭 전체를 추적하지는 않습니다.
 - 웹 Client Component는 `src/client/**` 또는 `src/**/*.client.*`에 둡니다. 여기서 Node·서버 모듈 직접 import를 금지합니다. 서버는 `src/server/`와 `server-only`를 사용합니다. `env`만으로 실제 서버·클라이언트 경계를 검증할 수 없으며 경로 규약 밖의 Client Component와 전이 import는 Next 빌드에서도 확인해야 합니다.
 - 서버 소스는 동기 I/O와 직접 `process.exit()`를 제한합니다. 개발 스크립트는 `scripts/`에 두며 웹에서는 ESM import를 사용합니다.
