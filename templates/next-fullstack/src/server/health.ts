@@ -1,5 +1,5 @@
-import "server-only";
+import 'server-only';
 
 export function getHealth() {
-  return { status: "ok" } as const;
+  return { status: 'ok' } as const;
 }

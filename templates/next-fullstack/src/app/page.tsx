@@ -1,5 +1,6 @@
-import * as stylex from "@stylexjs/stylex";
-import { HealthCheck } from "@/client/health-check";
+import * as stylex from '@stylexjs/stylex';
+
+import { HealthCheck } from '@/client/health-check';
 
 export default function Home() {
   return (
@@ -12,5 +13,5 @@ export default function Home() {
 }
 
 const styles = stylex.create({
-  main: { maxWidth: "42rem", margin: "0 auto" },
+  main: { maxWidth: '42rem', margin: '0 auto' },
 });
