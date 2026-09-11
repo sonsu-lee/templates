@@ -9,6 +9,7 @@
     "next-env.d.ts",
     "*.tsbuildinfo"
   ],
+  "singleAttributePerLine": true,
   "singleQuote": true,
   "sortImports": true,
   "sortPackageJson": {
