@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: next-fullstack / Lint & types
+            command: pnpm lint
+            directory: templates/next-fullstack
+          - name: next-fullstack / Format
+            command: pnpm format:check
+            directory: templates/next-fullstack
+          - name: next-fullstack / Build
+            command: pnpm build
+            directory: templates/next-fullstack
+          - name: next-node-nest / Web lint & types
+            command: pnpm --dir apps/web lint
+            directory: templates/next-node-nest
+          - name: next-node-nest / API lint
+            command: pnpm --dir apps/api lint
+            directory: templates/next-node-nest
+          - name: next-node-nest / API types
+            command: pnpm --dir apps/api typecheck
+            directory: templates/next-node-nest
+          - name: next-node-nest / Format
+            command: pnpm format:check
+            directory: templates/next-node-nest
+          - name: next-node-nest / Web build
+            command: pnpm --dir apps/web build
+            directory: templates/next-node-nest
+          - name: next-node-nest / API build
+            command: pnpm --dir apps/api build
+            directory: templates/next-node-nest
+    defaults:
+      run:
+        working-directory: ${{ matrix.directory }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: ${{ matrix.directory }}/.node-version
+          package-manager-cache: false
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
+        with:
+          package_json_file: ${{ matrix.directory }}/package.json
+          cache: true
+          cache_dependency_path: ${{ matrix.directory }}/pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: ${{ matrix.name }}
+        run: ${{ matrix.command }}

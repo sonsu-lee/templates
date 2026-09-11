@@ -40,3 +40,7 @@ named import 정렬은 Oxlint, import 선언·그룹·package.json 정렬과 포
 경로 기반 lint는 모든 전이 import를 추적하지 않으므로 `pnpm build`까지 실행합니다. Next·React·StyleX 공식 플러그인 전체와 동일한 검사 범위를 제공하지 않으며, warning은 검사 실패로 처리하지 않습니다.
 
 [Oxc 확장](https://marketplace.visualstudio.com/items?itemName=oxc.oxc-vscode)을 설치하고 이 폴더를 열면 `.vscode/settings.json`이 적용됩니다.
+
+## CI
+
+`.github/workflows/ci.yml`은 PR·main push·수동 실행 시 `Lint & types`, `Format`, `Build`를 각각 독립 job으로 실행합니다. 하나가 실패해도 다른 job은 계속 실행합니다. 각 job은 Node 24와 고정 pnpm 버전으로 frozen install 후 위 명령을 실행합니다. 기본 브랜치를 변경하면 workflow의 `push.branches`도 변경합니다.
