@@ -1,4 +1,4 @@
-# next-all-in-one
+# next-fullstack
 
 이 디렉터리만 복사해 사용하는 개인 프로젝트 템플릿입니다. 루트의 Oxlint·Oxfmt·TypeScript 설정으로 실행됩니다. 공유 Oxlint 설정, 외부 설정 패키지, ESLint는 없습니다.
 

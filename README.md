@@ -1,13 +1,13 @@
 # Personal application templates
 
-개인 프로젝트의 시작점으로 복사해 사용하는 템플릿을 제공합니다. 현재 포함된 템플릿은 [Next.js 올인원](templates/next-all-in-one/README.md)입니다.
+개인 프로젝트의 시작점으로 복사해 사용하는 템플릿을 제공합니다. 현재 포함된 템플릿은 [Next.js 풀스택](templates/next-fullstack/README.md)입니다.
 
 ## 사용
 
 새 프로젝트 경로로 템플릿 디렉터리를 복사합니다. 아래 명령은 저장소 루트에서 실행하며, 대상 경로는 아직 존재하지 않아야 합니다.
 
 ```sh
-cp -R templates/next-all-in-one ../my-app
+cp -R templates/next-fullstack ../my-app
 cd ../my-app
 pnpm install --frozen-lockfile
 pnpm dev
