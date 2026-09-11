@@ -12,7 +12,6 @@
   "sortImports": {
     "sortSideEffects": false
   },
-  "sortTailwindcss": false,
   "sortPackageJson": {
     "sortScripts": true
   }
