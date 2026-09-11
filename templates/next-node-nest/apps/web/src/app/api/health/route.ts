@@ -6,7 +6,8 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     return Response.json(await getHealth());
-  } catch {
+  } catch (error) {
+    console.error("Nest health check failed", error);
     return Response.json({ status: "unavailable" }, { status: 502 });
   }
 }

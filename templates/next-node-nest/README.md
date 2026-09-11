@@ -11,7 +11,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-웹은 <http://localhost:3000>, Nest 헬스체크는 <http://localhost:3001/health>입니다. 버튼은 Next `/api/health`를 호출하고 Next 서버가 Nest `/health`를 호출합니다. Nest 연결 실패·오류·잘못된 응답은 502로 반환하며 제한 시간은 5초입니다. 헬스체크는 프로세스·HTTP·constructor DI만 확인하며 DB readiness는 검사하지 않습니다.
+웹은 <http://localhost:3000>, Nest 헬스체크는 <http://localhost:3001/health>입니다. 버튼은 Next `/api/health`를 호출하고 Next 서버가 Nest `/health`를 호출합니다. Nest 연결 실패·오류·잘못된 응답은 원인을 Next 서버 로그에 기록하고 502로 반환하며 제한 시간은 5초입니다. 헬스체크는 프로세스·HTTP·constructor DI만 확인하며 DB readiness는 검사하지 않습니다.
 
 | 명령                | 동작                                 |
 | ------------------- | ------------------------------------ |
@@ -40,7 +40,7 @@ pnpm dev
 - 웹 Client Component는 `src/client/**` 또는 `src/**/*.client.*`에 둡니다. 여기서 Node·서버 모듈 직접 import를 금지합니다. 서버는 `src/server/`와 `server-only`를 사용합니다. `env`만으로 실제 서버·클라이언트 경계를 검증할 수 없으며 경로 규약 밖의 Client Component와 전이 import는 Next 빌드에서도 확인해야 합니다.
 - 서버 소스는 동기 I/O와 직접 `process.exit()`를 제한합니다. 개발 스크립트는 `scripts/`에 두며 웹에서는 ESM import를 사용합니다.
 - API의 `typescript/consistent-type-imports`는 끕니다. DI 클래스의 런타임 import와 `experimentalDecorators`·`emitDecoratorMetadata`를 유지합니다.
-- `all` 카테고리는 사용하지 않습니다. warning은 lint를 실패시키지 않으며 `lint:fix`는 `--fix`만 사용합니다. 빌드 결과·coverage·Next 생성 선언은 제외하고 설정·스크립트 소스는 검사합니다.
+- `all` 카테고리는 사용하지 않습니다. warning은 lint를 실패시키지 않으며 `lint:fix`는 `--fix`만 사용합니다. 빌드 결과·coverage·Next 생성 선언은 제외하고 설정·스크립트 소스는 검사합니다. 웹 lint는 `next typegen`이 생성하는 `.next/types/validator.ts`를 명시적으로 포함해 페이지·레이아웃·Route Handler의 타입 계약도 검사합니다. 생성 파일에는 `-A all`로 lint 규칙을 끄고 타입 검사만 실행하며 자동수정하지 않습니다. `.next/` 전체를 Oxlint에서 제외하면 이 검사까지 빠지므로 cache·server·static·dev 하위 디렉터리를 제외합니다.
 
 웹은 React·Hooks·접근성·Next 내장 규칙을 적용합니다. Next 권장 규칙 22개 중 Oxlint 대응 규칙 21개를 명시하고 Core Web Vitals 링크·동기 스크립트 규칙은 error입니다. `no-location-assign-relative-destination`은 내장 구현이 없어 검사하지 않습니다. `eslint-config-next` 전체와 동등하지 않습니다. React Compiler 개별 correctness 규칙과 `unsupported-syntax`를 사용하지만 미구현 `config`·`gating` 검사나 Compiler 변환 활성화를 제공하지 않습니다.
 

@@ -15,7 +15,10 @@
   },
   "ignorePatterns": [
     "node_modules/",
-    ".next/",
+    ".next/cache/",
+    ".next/server/",
+    ".next/static/",
+    ".next/dev/",
     "out/",
     "dist/",
     "coverage/",
