@@ -1,0 +1,15 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "ignorePatterns": [
+    "node_modules/",
+    ".next/",
+    "out/",
+    "dist/",
+    "coverage/",
+    "next-env.d.ts",
+    "*.tsbuildinfo"
+  ],
+  "sortImports": false,
+  "sortTailwindcss": false,
+  "sortPackageJson": false
+}
