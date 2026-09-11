@@ -12,7 +12,7 @@ async function bootstrap(): Promise<void> {
     .setVersion("1.0.0")
     .build();
   SwaggerModule.setup("docs", app, () => SwaggerModule.createDocument(app, config));
-  await app.listen(Number(process.env.PORT ?? 3001), "0.0.0.0");
+  await app.listen(Number(process.env.PORT ?? 8080), "0.0.0.0");
 }
 
 bootstrap().catch((error: unknown) => {

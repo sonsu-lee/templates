@@ -1,7 +1,7 @@
 import "server-only";
 
 export async function getHealth(): Promise<{ status: "ok" }> {
-  const response = await fetch(new URL("/health", process.env.API_URL ?? "http://localhost:3001"), {
+  const response = await fetch(new URL("/health", process.env.API_URL ?? "http://localhost:8080"), {
     cache: "no-store",
     signal: AbortSignal.timeout(5000),
   });

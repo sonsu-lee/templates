@@ -11,7 +11,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-웹은 <http://localhost:3000>, Nest 헬스체크는 <http://localhost:3001/health>입니다. 버튼은 Next `/api/health`를 호출하고 Next 서버가 Nest `/health`를 호출합니다. Nest 연결 실패·오류·잘못된 응답은 원인을 Next 서버 로그에 기록하고 502로 반환하며 제한 시간은 5초입니다. 헬스체크는 프로세스·HTTP·constructor DI만 확인하며 DB readiness는 검사하지 않습니다.
+웹은 <http://localhost:3000>, Nest 헬스체크는 <http://localhost:8080/health>입니다. 버튼은 Next `/api/health`를 호출하고 Next 서버가 Nest `/health`를 호출합니다. Nest 연결 실패·오류·잘못된 응답은 원인을 Next 서버 로그에 기록하고 502로 반환하며 제한 시간은 5초입니다. 헬스체크는 프로세스·HTTP·constructor DI만 확인하며 DB readiness는 검사하지 않습니다.
 
 | 명령                | 동작                                 |
 | ------------------- | ------------------------------------ |
@@ -27,9 +27,9 @@ pnpm dev
 
 ## 환경 변수
 
-- 웹은 서버 전용 `API_URL`(기본 `http://localhost:3001`)을 요청 시 읽습니다. `apps/web/.env.example`을 `.env.local`로 복사하거나 프로세스 환경으로 전달합니다. 컨테이너에서는 Next가 접근할 수 있는 Nest 서비스 주소를 지정합니다.
+- 웹은 서버 전용 `API_URL`(기본 `http://localhost:8080`)을 요청 시 읽습니다. `apps/web/.env.example`을 `.env.local`로 복사하거나 프로세스 환경으로 전달합니다. 컨테이너에서는 Next가 접근할 수 있는 Nest 서비스 주소를 지정합니다.
 - 브라우저는 같은 출처의 Next API를 호출하므로 이 예제에는 Nest CORS 설정이 필요하지 않습니다.
-- Nest는 프로세스 환경의 `PORT`(기본 `3001`)를 읽습니다. `.env.example`은 자동 로딩하지 않습니다. 예: `PORT=4001 pnpm --dir apps/api start`.
+- Nest는 프로세스 환경의 `PORT`(기본 `8080`)를 읽습니다. `.env.example`은 자동 로딩하지 않습니다. 예: `PORT=4001 pnpm --dir apps/api start`.
 
 ## 앱별 설정과 경계
 
