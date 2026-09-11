@@ -1,0 +1,10 @@
+.cache/
+.sonsu/
+.worktrees/
+node_modules/
+.next/
+out/
+dist/
+coverage/
+*.tsbuildinfo
+.DS_Store
