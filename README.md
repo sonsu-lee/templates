@@ -16,4 +16,4 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-변경 후 `pnpm lint`, `pnpm format:check`, `pnpm build`를 각각 실행합니다. Nest API는 `pnpm typecheck`로 타입 검사합니다. 앱별 환경 변수와 개발 규칙은 각 템플릿 README를 참고하세요.
+변경 후 `pnpm lint`, `pnpm format:check`, `pnpm build`를 각각 실행합니다. Nest API는 `pnpm typecheck`로 타입 검사합니다. GitHub Actions는 검사 종류·앱별 독립 job으로 실행되며, 각 템플릿에도 복사해서 사용할 workflow가 포함됩니다. 앱별 환경 변수와 개발 규칙은 각 템플릿 README를 참고하세요.

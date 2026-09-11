@@ -56,3 +56,7 @@ named import 정렬은 Oxlint, import 선언·그룹·package.json 정렬과 포
 ## 에디터
 
 [Oxc 확장](https://marketplace.visualstudio.com/items?itemName=oxc.oxc-vscode)을 설치하고 `project.code-workspace`를 엽니다. web·api를 별도 폴더로 열어 웹에만 타입 기반 lint를 적용합니다. 루트에서는 `pnpm lint`로 앱별 검사를 실행합니다.
+
+## CI
+
+`.github/workflows/ci.yml`은 PR·main push·수동 실행 시 `Web lint & types`, `API lint`, `API types`, `Format`, `Web build`, `API build`를 각각 독립 job으로 실행합니다. 포맷은 workspace 전체를 한 번 검사합니다. 하나가 실패해도 다른 job은 계속 실행합니다. 각 job은 Node 24와 고정 pnpm 버전으로 frozen install 후 위 명령을 실행합니다. 기본 브랜치를 변경하면 workflow의 `push.branches`도 변경합니다.
