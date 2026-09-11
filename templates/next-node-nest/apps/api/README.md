@@ -1,6 +1,6 @@
 # API
 
-NestJS API입니다. 설치와 공통 명령은 [workspace README](../../README.md)를 참고하세요. 이 폴더에서도 `pnpm dev`, `pnpm check`, `pnpm verify`를 실행할 수 있습니다.
+NestJS API입니다. 설치와 공통 명령은 [workspace README](../../README.md)를 참고하세요. 이 폴더에서도 `pnpm dev`, `pnpm lint`, `pnpm format:check`, `pnpm build`를 실행할 수 있습니다.
 
 `GET /health`는 `{ "status": "ok" }`를 반환합니다. `PORT`는 기본 8080이며 프로세스 환경으로 전달합니다. `.env.example`은 자동 로딩하지 않습니다.
 

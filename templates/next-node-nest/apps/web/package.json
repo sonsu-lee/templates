@@ -4,14 +4,12 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "check": "pnpm lint && pnpm format:check",
     "dev": "next dev",
     "format": "oxfmt --write .",
     "format:check": "oxfmt --check .",
     "lint": "next typegen && oxlint . && oxlint -A all .next/types/validator.ts",
     "lint:fix": "next typegen && oxlint . --fix && oxlint -A all .next/types/validator.ts",
-    "start": "next start",
-    "verify": "pnpm check && pnpm build"
+    "start": "next start"
   },
   "dependencies": {
     "@stylexjs/stylex": "0.19.0",

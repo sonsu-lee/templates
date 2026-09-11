@@ -23,14 +23,12 @@ workspace 루트에서 실행합니다.
 
 | 명령                                | 동작                                           |
 | ----------------------------------- | ---------------------------------------------- |
-| `pnpm check`                        | 두 앱의 lint·타입 검사와 전체 포맷 검사        |
-| `pnpm verify`                       | check 후 두 앱 빌드                            |
 | `pnpm lint` / `pnpm lint:fix`       | 앱별 lint / 명시적 자동수정                    |
 | `pnpm typecheck`                    | API TS6 타입 검사 (웹 타입 검사는 lint에 포함) |
 | `pnpm format:check` / `pnpm format` | 전체 포맷 검사 / 적용                          |
 | `pnpm build`                        | 두 앱 프로덕션 빌드                            |
 
-자동수정은 `pnpm lint:fix && pnpm format` 후 `pnpm check`로 확인합니다. check는 소스를 자동수정하지 않으며 Next 생성 타입은 갱신합니다.
+자동수정은 `pnpm lint:fix && pnpm format`으로 실행합니다. 이후 각 검사 명령을 다시 실행합니다. `lint`는 소스를 자동수정하지 않으며 Next 생성 타입은 갱신합니다.
 
 빌드 후 별도 터미널에서 `pnpm --dir apps/api start`와 `pnpm --dir apps/web start`를 실행합니다. 빌드 시 Nest가 실행 중일 필요는 없습니다.
 
@@ -53,8 +51,12 @@ API의 `.env.example`은 자동 로딩하지 않습니다. 컨테이너에서는
 
 named import 정렬은 Oxlint, import 선언·그룹·package.json 정렬과 포맷은 Oxfmt가 담당합니다. ESLint·외부 lint 플러그인은 사용하지 않습니다. 초기화 순서가 중요한 import 묶음은 각 import 앞에 `// oxfmt-ignore`를 붙입니다.
 
-경로 기반 lint는 모든 전이 import를 추적하지 않으므로 `verify`까지 실행합니다. Next·React·StyleX 공식 플러그인 전체와 동일한 검사 범위를 제공하지 않으며, warning은 검사 실패로 처리하지 않습니다. API의 타입 검사는 Promise 오용 lint를 대신하지 않습니다.
+경로 기반 lint는 모든 전이 import를 추적하지 않으므로 `pnpm build`까지 실행합니다. Next·React·StyleX 공식 플러그인 전체와 동일한 검사 범위를 제공하지 않으며, warning은 검사 실패로 처리하지 않습니다. API의 타입 검사는 Promise 오용 lint를 대신하지 않습니다.
 
 ## 에디터
 
 [Oxc 확장](https://marketplace.visualstudio.com/items?itemName=oxc.oxc-vscode)을 설치하고 `project.code-workspace`를 엽니다. web·api를 별도 폴더로 열어 웹에만 타입 기반 lint를 적용합니다. 루트에서는 `pnpm lint`로 앱별 검사를 실행합니다.
+
+## CI
+
+`.github/workflows/ci.yml`은 PR·main push·수동 실행 시 `Web lint & types`, `API lint`, `API types`, `Format`, `Web build`, `API build`를 각각 독립 job으로 실행합니다. 포맷은 workspace 전체를 한 번 검사합니다. 하나가 실패해도 다른 job은 계속 실행합니다. 각 job은 Node 24와 고정 pnpm 버전으로 frozen install 후 위 명령을 실행합니다. 기본 브랜치를 변경하면 workflow의 `push.branches`도 변경합니다.

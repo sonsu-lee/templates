@@ -4,15 +4,13 @@
   "private": true,
   "scripts": {
     "build": "nest build",
-    "check": "pnpm lint && pnpm typecheck && pnpm format:check",
     "dev": "nest start --watch",
     "format": "oxfmt --write .",
     "format:check": "oxfmt --check .",
     "lint": "oxlint .",
     "lint:fix": "oxlint . --fix",
     "start": "node dist/main.js",
-    "typecheck": "tsc --noEmit",
-    "verify": "pnpm check && pnpm build"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@nestjs/common": "12.0.1",

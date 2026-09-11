@@ -4,14 +4,12 @@
   "private": true,
   "scripts": {
     "build": "pnpm -r run build",
-    "check": "pnpm lint && pnpm typecheck && pnpm format:check",
     "dev": "pnpm -r --parallel run dev",
     "format": "oxfmt --write .",
     "format:check": "oxfmt --check .",
     "lint": "pnpm -r run lint",
     "lint:fix": "pnpm -r run lint:fix",
-    "typecheck": "pnpm -r run typecheck",
-    "verify": "pnpm check && pnpm build"
+    "typecheck": "pnpm -r run typecheck"
   },
   "devDependencies": {
     "oxfmt": "0.67.0"
