@@ -13,7 +13,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Node 24.21.0과 pnpm 12.3.4를 사용합니다. 웹은 `http://localhost:3000`, 헬스체크는 `http://localhost:3000/api/health`에서 확인합니다.
+Node 24 이상과 pnpm 12.3.4를 사용합니다. Node는 최신 LTS를 권장합니다. 웹은 `http://localhost:3000`, 헬스체크는 `http://localhost:3000/api/health`에서 확인합니다.
 
 ## 구성
 

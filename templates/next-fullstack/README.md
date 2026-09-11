@@ -4,7 +4,7 @@
 
 ## 시작
 
-Node **24.21.0**, pnpm **12.3.4**를 사용합니다. `.node-version`과 `packageManager`에 고정되어 있습니다. `pnpm-workspace.yaml`의 `saveExact: true`는 새로 추가하는 의존성도 정확한 버전으로 저장합니다.
+Node **24 이상**과 pnpm **12.3.4**를 사용합니다. Node는 최신 LTS를 권장합니다. `.node-version`은 기본 개발 버전을 `24`로 지정하며, pnpm은 `packageManager`에 고정되어 있습니다. `pnpm-workspace.yaml`의 `saveExact: true`는 새로 추가하는 의존성도 정확한 버전으로 저장합니다.
 
 ```sh
 pnpm install --frozen-lockfile
