@@ -1,0 +1,9 @@
+# Keep intentional generated-output fixtures in version control.
+!**/.next/
+!**/.next/**
+!**/out/
+!**/out/**
+!**/dist/
+!**/dist/**
+!**/coverage/
+!**/coverage/**

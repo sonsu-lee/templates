@@ -1,0 +1,22 @@
+{
+  "name": "next-static-nest",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "pnpm -r run build",
+    "dev": "pnpm -r --parallel run dev",
+    "format": "oxfmt --write .",
+    "format:check": "oxfmt --check .",
+    "lint": "pnpm -r run lint",
+    "lint:fix": "pnpm -r run lint:fix",
+    "start": "pnpm --dir apps/api start",
+    "typecheck": "pnpm -r run typecheck"
+  },
+  "devDependencies": {
+    "oxfmt": "0.67.0"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@12.3.4"
+}

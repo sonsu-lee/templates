@@ -49,6 +49,24 @@ jobs:
           - name: next-node-nest / API build
             command: pnpm --dir apps/api build
             directory: templates/next-node-nest
+          - name: next-static-nest / Web lint & types
+            command: pnpm --dir apps/web lint
+            directory: templates/next-static-nest
+          - name: next-static-nest / API lint
+            command: pnpm --dir apps/api lint
+            directory: templates/next-static-nest
+          - name: next-static-nest / API types
+            command: pnpm --dir apps/api typecheck
+            directory: templates/next-static-nest
+          - name: next-static-nest / Format
+            command: pnpm format:check
+            directory: templates/next-static-nest
+          - name: next-static-nest / Web build
+            command: pnpm --dir apps/web build
+            directory: templates/next-static-nest
+          - name: next-static-nest / API build
+            command: pnpm --dir apps/api build
+            directory: templates/next-static-nest
     defaults:
       run:
         working-directory: ${{ matrix.directory }}
