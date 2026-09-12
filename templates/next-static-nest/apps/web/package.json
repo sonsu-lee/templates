@@ -8,8 +8,7 @@
     "format": "oxfmt --write .",
     "format:check": "oxfmt --check .",
     "lint": "next typegen && oxlint .",
-    "lint:fix": "next typegen && oxlint . --fix",
-    "start": "serve out -l 3000"
+    "lint:fix": "next typegen && oxlint . --fix"
   },
   "dependencies": {
     "@stylexjs/stylex": "0.19.0",
@@ -26,7 +25,6 @@
     "oxfmt": "0.67.0",
     "oxlint": "1.82.0",
     "oxlint-tsgolint": "7.0.2001",
-    "serve": "14.2.6",
     "typescript": "7.0.2"
   },
   "engines": {

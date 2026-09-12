@@ -30,12 +30,12 @@ VS Code에서는 `project.code-workspace`를 열고 권장 Oxc 확장을 설치�
 | ----------------------------------- | ------------------------------------------- |
 | `pnpm dev`                          | 웹·API 개발 서버 실행                       |
 | `pnpm build`                        | 웹·API 빌드                                 |
-| `pnpm start`                        | 빌드된 웹·API 실행                          |
+| `pnpm start`                        | 빌드된 API 실행                             |
 | `pnpm lint` / `pnpm lint:fix`       | lint 검사 / 자동수정                        |
 | `pnpm typecheck`                    | API 타입 검사. 웹 타입 검사는 `lint`에 포함 |
 | `pnpm format:check` / `pnpm format` | 포맷 검사 / 적용                            |
 
-`pnpm start`를 실행하기 전에 `pnpm build`를 실행합니다. 웹은 정적 파일 서버인 `serve`로, API는 Node.js로 실행됩니다.
+`pnpm start`를 실행하기 전에 `pnpm build`를 실행합니다. 웹의 정적 파일은 `apps/web/out/`에 생성됩니다.
 
 GitHub Actions는 PR과 `main` 브랜치 push 시 lint, 타입, 포맷, 빌드를 검사합니다.
 

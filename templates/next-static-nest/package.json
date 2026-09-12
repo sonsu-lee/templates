@@ -9,7 +9,7 @@
     "format:check": "oxfmt --check .",
     "lint": "pnpm -r run lint",
     "lint:fix": "pnpm -r run lint:fix",
-    "start": "pnpm -r --parallel run start",
+    "start": "pnpm --dir apps/api start",
     "typecheck": "pnpm -r run typecheck"
   },
   "devDependencies": {
