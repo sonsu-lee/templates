@@ -1,0 +1,36 @@
+{
+  "name": "@template/web",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev",
+    "format": "oxfmt --write .",
+    "format:check": "oxfmt --check .",
+    "lint": "next typegen && oxlint .",
+    "lint:fix": "next typegen && oxlint . --fix",
+    "start": "serve out -l 3000"
+  },
+  "dependencies": {
+    "@stylexjs/stylex": "0.19.0",
+    "next": "16.3.4",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@stylexjs/babel-plugin": "0.19.0",
+    "@stylexjs/postcss-plugin": "0.19.0",
+    "@types/node": "24.13.4",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "oxfmt": "0.67.0",
+    "oxlint": "1.82.0",
+    "oxlint-tsgolint": "7.0.2001",
+    "serve": "14.2.6",
+    "typescript": "7.0.2"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@12.3.4"
+}

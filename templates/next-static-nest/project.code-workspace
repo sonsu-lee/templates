@@ -1,0 +1,15 @@
+{
+  "folders": [
+    {
+      "name": "web",
+      "path": "apps/web",
+    },
+    {
+      "name": "api",
+      "path": "apps/api",
+    },
+  ],
+  "extensions": {
+    "recommendations": ["oxc.oxc-vscode"],
+  },
+}

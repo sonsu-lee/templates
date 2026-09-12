@@ -1,0 +1,118 @@
+[
+  {
+    "name": "static-content",
+    "command": "pnpm --dir apps/web build",
+    "exit": 0,
+    "diagnostics": [],
+    "outputs": {
+      "apps/web/out/index.html": "build-time-file-content",
+      "apps/web/out/data.json": "static-get",
+      "apps/web/out/posts/first/index.html": "first"
+    }
+  },
+  {
+    "name": "request-route",
+    "command": "pnpm --dir apps/web build",
+    "exit": 1,
+    "diagnostics": ["output: export"],
+    "outputs": {}
+  },
+  {
+    "name": "server-action",
+    "command": "pnpm --dir apps/web build",
+    "exit": 1,
+    "diagnostics": ["Server Actions", "static export"],
+    "outputs": {}
+  },
+  {
+    "name": "dynamic-route",
+    "command": "pnpm --dir apps/web build",
+    "exit": 1,
+    "diagnostics": ["generateStaticParams"],
+    "outputs": {}
+  },
+  {
+    "name": "transitive-server-only",
+    "command": "pnpm --dir apps/web build",
+    "exit": 1,
+    "diagnostics": ["server-only", "Client Component"],
+    "outputs": {}
+  },
+  {
+    "name": "web-imports",
+    "command": "pnpm --dir apps/web lint",
+    "exit": 1,
+    "diagnostics": ["no-restricted-imports", "no-require-imports"],
+    "outputs": {}
+  },
+  {
+    "name": "client-imports",
+    "command": "pnpm --dir apps/web lint",
+    "exit": 1,
+    "diagnostics": ["no-restricted-imports", "no-nodejs-modules", "no-require-imports"],
+    "outputs": {}
+  },
+  {
+    "name": "web-types-promises",
+    "command": "pnpm --dir apps/web lint",
+    "exit": 1,
+    "diagnostics": ["no-floating-promises", "no-misused-promises", "no-unsafe-assignment"],
+    "outputs": {}
+  },
+  {
+    "name": "web-ui-rules",
+    "command": "pnpm --dir apps/web lint",
+    "exit": 1,
+    "diagnostics": ["rules-of-hooks", "alt-text", "no-sync-scripts"],
+    "outputs": {}
+  },
+  {
+    "name": "web-script",
+    "command": "pnpm --dir apps/web lint",
+    "exit": 1,
+    "diagnostics": ["no-debugger"],
+    "outputs": {}
+  },
+  {
+    "name": "web-config",
+    "command": "pnpm --dir apps/web lint",
+    "exit": 1,
+    "diagnostics": ["no-debugger"],
+    "outputs": {}
+  },
+  {
+    "name": "api-runtime",
+    "command": "pnpm --dir apps/api lint",
+    "exit": 1,
+    "diagnostics": ["no-sync", "no-process-exit"],
+    "outputs": {}
+  },
+  {
+    "name": "api-general-only",
+    "command": "pnpm --dir apps/api lint",
+    "exit": 0,
+    "diagnostics": [],
+    "outputs": {}
+  },
+  {
+    "name": "api-types",
+    "command": "pnpm --dir apps/api typecheck",
+    "exit": 2,
+    "diagnostics": ["not assignable to type 'number'"],
+    "outputs": {}
+  },
+  {
+    "name": "safe-fix",
+    "command": "pnpm --dir apps/api lint",
+    "exit": 1,
+    "diagnostics": ["sort-imports"],
+    "outputs": {}
+  },
+  {
+    "name": "excluded-output",
+    "command": "pnpm lint",
+    "exit": 0,
+    "diagnostics": [],
+    "outputs": {}
+  }
+]
