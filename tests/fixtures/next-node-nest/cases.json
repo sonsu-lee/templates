@@ -1,66 +1,5 @@
 [
   {
-    "name": "static-content",
-    "steps": [
-      {
-        "argv": ["pnpm", "--dir", "apps/web", "build"],
-        "exit": 0,
-        "diagnostics": [],
-        "outputs": {
-          "apps/web/out/index.html": "build-time-file-content",
-          "apps/web/out/data.json": "static-get",
-          "apps/web/out/posts/first/index.html": "first"
-        }
-      },
-      {
-        "argv": ["pnpm", "--dir", "apps/web", "lint"]
-      }
-    ],
-    "files": [
-      "apps/web/content.txt",
-      "apps/web/scripts/read-content.mjs",
-      "apps/web/src/app/data.json/route.ts",
-      "apps/web/src/app/page.tsx",
-      "apps/web/src/app/posts/[slug]/page.tsx"
-    ]
-  },
-  {
-    "name": "request-route",
-    "steps": [
-      {
-        "argv": ["pnpm", "--dir", "apps/web", "build"],
-        "exit": 1,
-        "diagnostics": ["output: export"],
-        "outputs": {}
-      }
-    ],
-    "files": ["apps/web/src/app/request/route.ts"]
-  },
-  {
-    "name": "server-action",
-    "steps": [
-      {
-        "argv": ["pnpm", "--dir", "apps/web", "build"],
-        "exit": 1,
-        "diagnostics": ["Server Actions", "static export"],
-        "outputs": {}
-      }
-    ],
-    "files": ["apps/web/src/app/page.tsx"]
-  },
-  {
-    "name": "dynamic-route",
-    "steps": [
-      {
-        "argv": ["pnpm", "--dir", "apps/web", "build"],
-        "exit": 1,
-        "diagnostics": ["generateStaticParams"],
-        "outputs": {}
-      }
-    ],
-    "files": ["apps/web/src/app/posts/[slug]/page.tsx"]
-  },
-  {
     "name": "transitive-server-only",
     "steps": [
       {
@@ -76,7 +15,8 @@
       "apps/web/src/bridge.ts",
       "apps/web/src/client/leak.tsx",
       "apps/web/src/server/secret.ts"
-    ]
+    ],
+    "fixture": "next-static-nest/transitive-server-only"
   },
   {
     "name": "web-imports",
@@ -87,26 +27,8 @@
         "diagnostics": ["no-restricted-imports", "no-require-imports"],
         "outputs": {},
         "diagnosticFiles": {
-          "apps/web/blocked.config.mjs": [
-            {
-              "rule": "no-restricted-imports",
-              "message": "'next/server'"
-            },
-            {
-              "rule": "no-restricted-imports",
-              "message": "'pg'"
-            }
-          ],
-          "apps/web/scripts/blocked.mjs": [
-            {
-              "rule": "no-restricted-imports",
-              "message": "'next/headers'"
-            },
-            {
-              "rule": "no-restricted-imports",
-              "message": "'../../api/src/health.service'"
-            }
-          ],
+          "apps/web/blocked.config.mjs": ["no-restricted-imports"],
+          "apps/web/scripts/blocked.mjs": ["no-restricted-imports"],
           "apps/web/src/blocked-require.js": ["no-require-imports"],
           "apps/web/src/blocked.ts": [
             {
@@ -128,14 +50,6 @@
             {
               "rule": "no-restricted-imports",
               "message": "'pg'"
-            },
-            {
-              "rule": "no-restricted-imports",
-              "message": "'next/headers'"
-            },
-            {
-              "rule": "no-restricted-imports",
-              "message": "'next/server'"
             }
           ]
         }
@@ -147,7 +61,8 @@
       "apps/web/scripts/blocked.mjs",
       "apps/web/src/blocked-require.js",
       "apps/web/src/blocked.ts"
-    ]
+    ],
+    "fixture": "next-static-nest/web-imports"
   },
   {
     "name": "client-imports",
@@ -179,14 +94,6 @@
               "rule": "no-restricted-imports",
               "message": "'../../../api/src/health.service'"
             },
-            {
-              "rule": "no-restricted-imports",
-              "message": "'next/headers'"
-            },
-            {
-              "rule": "no-restricted-imports",
-              "message": "'next/server'"
-            },
             "no-nodejs-modules"
           ],
           "apps/web/src/widget.client.ts": ["no-restricted-imports"]
@@ -199,7 +106,8 @@
       "apps/web/src/client/blocked.mjs",
       "apps/web/src/client/blocked.ts",
       "apps/web/src/widget.client.ts"
-    ]
+    ],
+    "fixture": "next-static-nest/client-imports"
   },
   {
     "name": "web-types-promises",
@@ -227,7 +135,8 @@
         }
       }
     ],
-    "files": ["apps/web/src/checks.ts"]
+    "files": ["apps/web/src/checks.ts"],
+    "fixture": "next-static-nest/web-types-promises"
   },
   {
     "name": "web-ui-rules",
@@ -242,7 +151,8 @@
         }
       }
     ],
-    "files": ["apps/web/src/client/rules.tsx"]
+    "files": ["apps/web/src/client/rules.tsx"],
+    "fixture": "next-static-nest/web-ui-rules"
   },
   {
     "name": "web-script",
@@ -257,7 +167,8 @@
         }
       }
     ],
-    "files": ["apps/web/scripts/check.mjs"]
+    "files": ["apps/web/scripts/check.mjs"],
+    "fixture": "next-static-nest/web-script"
   },
   {
     "name": "web-config",
@@ -272,7 +183,8 @@
         }
       }
     ],
-    "files": ["apps/web/check.config.mjs"]
+    "files": ["apps/web/check.config.mjs"],
+    "fixture": "next-static-nest/web-config"
   },
   {
     "name": "api-runtime",
@@ -287,7 +199,8 @@
         }
       }
     ],
-    "files": ["apps/api/src/checks.ts"]
+    "files": ["apps/api/src/checks.ts"],
+    "fixture": "next-static-nest/api-runtime"
   },
   {
     "name": "api-general-only",
@@ -299,7 +212,8 @@
         "outputs": {}
       }
     ],
-    "files": ["apps/api/src/checks.ts"]
+    "files": ["apps/api/src/checks.ts"],
+    "fixture": "next-static-nest/api-general-only"
   },
   {
     "name": "api-types",
@@ -311,7 +225,8 @@
         "outputs": {}
       }
     ],
-    "files": ["apps/api/src/checks.ts"]
+    "files": ["apps/api/src/checks.ts"],
+    "fixture": "next-static-nest/api-types"
   },
   {
     "name": "safe-fix",
@@ -327,7 +242,8 @@
       }
     ],
     "hook": "safe-fix",
-    "files": ["apps/api/src/health.controller.ts"]
+    "files": ["apps/api/src/health.controller.ts"],
+    "fixture": "next-static-nest/safe-fix"
   },
   {
     "name": "excluded-output",
@@ -347,18 +263,23 @@
       "apps/web/.next/static/check.js",
       "apps/web/coverage/check.js",
       "apps/web/out/check.js"
-    ]
+    ],
+    "fixture": "next-static-nest/excluded-output"
   },
   {
     "name": "allowed-code",
     "files": [
       "apps/web/scripts/allowed.mjs",
       "apps/web/src/server/allowed.ts",
-      "apps/web/src/client/allowed.ts"
+      "apps/web/src/client/allowed.ts",
+      "apps/web/src/app/api/verification/route.ts"
     ],
     "steps": [
       {
         "argv": ["pnpm", "lint"]
+      },
+      {
+        "argv": ["pnpm", "build"]
       }
     ]
   }

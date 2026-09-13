@@ -1,0 +1,9 @@
+# Intentional build-output fixtures must remain versioned.
+!**/.next/
+!**/.next/**
+!**/out/
+!**/out/**
+!**/dist/
+!**/dist/**
+!**/coverage/
+!**/coverage/**

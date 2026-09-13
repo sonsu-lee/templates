@@ -13,11 +13,16 @@ from pathlib import Path
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cargo", default="cargo")
+    parser.add_argument("--output-dir", type=Path)
     args = parser.parse_args()
     source = Path(__file__).resolve().parents[1]
-    parent = Path.home() / "tmp"
-    parent.mkdir(exist_ok=True)
-    output = Path(tempfile.mkdtemp(prefix="personal-template-embedding.", dir=parent))
+    if args.output_dir:
+        output = args.output_dir.expanduser().resolve()
+        output.mkdir(parents=True, exist_ok=False)
+    else:
+        parent = Path.home() / "tmp"
+        parent.mkdir(exist_ok=True)
+        output = Path(tempfile.mkdtemp(prefix="personal-template-embedding.", dir=parent))
     checkout = output / "source"
     checkout.mkdir()
     report = {"directory": str(output), "commands": [], "status": "running"}
