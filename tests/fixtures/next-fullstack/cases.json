@@ -1,0 +1,162 @@
+[
+  {
+    "name": "transitive-server-only",
+    "steps": [
+      {
+        "argv": ["pnpm", "build"],
+        "exit": 1,
+        "diagnostics": ["server-only", "Client Component"],
+        "outputs": {},
+        "forbidden": ["Module not found", "Cannot find module"]
+      }
+    ],
+    "files": ["src/app/page.tsx", "src/bridge.ts", "src/client/leak.tsx", "src/server/secret.ts"]
+  },
+  {
+    "name": "client-imports",
+    "steps": [
+      {
+        "argv": ["pnpm", "lint"],
+        "exit": 1,
+        "diagnostics": ["no-restricted-imports", "no-nodejs-modules", "no-require-imports"],
+        "outputs": {},
+        "diagnosticFiles": {
+          "src/client/blocked.js": ["no-require-imports", "no-nodejs-modules"],
+          "src/client/blocked.jsx": ["no-restricted-imports", "no-nodejs-modules"],
+          "src/client/blocked.mjs": [
+            {
+              "rule": "no-restricted-imports",
+              "message": "'server-only'"
+            },
+            {
+              "rule": "no-restricted-imports",
+              "message": "'pg'"
+            }
+          ],
+          "src/client/blocked.ts": [
+            {
+              "rule": "no-restricted-imports",
+              "message": "'node:fs'"
+            },
+            {
+              "rule": "no-restricted-imports",
+              "message": "'../server/health'"
+            },
+            "no-nodejs-modules"
+          ],
+          "src/widget.client.ts": ["no-restricted-imports"]
+        }
+      }
+    ],
+    "files": [
+      "src/client/blocked.js",
+      "src/client/blocked.jsx",
+      "src/client/blocked.mjs",
+      "src/client/blocked.ts",
+      "src/widget.client.ts"
+    ]
+  },
+  {
+    "name": "web-types-promises",
+    "steps": [
+      {
+        "argv": ["pnpm", "lint"],
+        "exit": 1,
+        "diagnostics": [
+          "no-floating-promises",
+          "no-misused-promises",
+          "no-unsafe-assignment",
+          "not assignable to type 'number'"
+        ],
+        "outputs": {},
+        "diagnosticFiles": {
+          "src/checks.ts": [
+            "no-floating-promises",
+            "no-misused-promises",
+            "no-unsafe-assignment",
+            {
+              "rule": "TS2322",
+              "message": "not assignable to type 'number'"
+            }
+          ]
+        }
+      }
+    ],
+    "files": ["src/checks.ts"]
+  },
+  {
+    "name": "web-ui-rules",
+    "steps": [
+      {
+        "argv": ["pnpm", "lint"],
+        "exit": 1,
+        "diagnostics": ["rules-of-hooks", "alt-text", "no-sync-scripts"],
+        "outputs": {},
+        "diagnosticFiles": {
+          "src/client/rules.tsx": ["rules-of-hooks", "alt-text", "no-sync-scripts"]
+        }
+      }
+    ],
+    "files": ["src/client/rules.tsx"]
+  },
+  {
+    "name": "web-script",
+    "steps": [
+      {
+        "argv": ["pnpm", "lint"],
+        "exit": 1,
+        "diagnostics": ["no-debugger"],
+        "outputs": {},
+        "diagnosticFiles": {
+          "scripts/check.mjs": ["no-debugger"]
+        }
+      }
+    ],
+    "files": ["scripts/check.mjs"]
+  },
+  {
+    "name": "web-config",
+    "steps": [
+      {
+        "argv": ["pnpm", "lint"],
+        "exit": 1,
+        "diagnostics": ["no-debugger"],
+        "outputs": {},
+        "diagnosticFiles": {
+          "check.config.mjs": ["no-debugger"]
+        }
+      }
+    ],
+    "files": ["check.config.mjs"]
+  },
+  {
+    "name": "excluded-output",
+    "steps": [
+      {
+        "argv": ["pnpm", "lint"],
+        "exit": 0,
+        "diagnostics": [],
+        "outputs": {}
+      }
+    ],
+    "hook": "excluded-output",
+    "files": [".next/server/check.js", ".next/static/check.js", "coverage/check.js", "out/check.js"]
+  },
+  {
+    "name": "allowed-code",
+    "files": [
+      "scripts/allowed.mjs",
+      "src/server/allowed.ts",
+      "src/client/allowed.ts",
+      "src/app/api/verification/route.ts"
+    ],
+    "steps": [
+      {
+        "argv": ["pnpm", "lint"]
+      },
+      {
+        "argv": ["pnpm", "build"]
+      }
+    ]
+  }
+]

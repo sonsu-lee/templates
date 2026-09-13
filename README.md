@@ -76,4 +76,33 @@ python3 tests/verify_embedding.py
 
 첫 명령은 `~/tmp/personal-template-issue4.*`에 바이너리를 복사하고, 명시적 옵션과 실제 PTY의 방향키 메뉴로 프로젝트를 생성합니다. 원본 경로 읽기·네트워크 차단도 검사합니다. 두 번째 명령은 별도 소스 사본에서 오프라인으로 빌드하며 파일 추가·수정·삭제 반영과 내장 제외 규칙을 검사하므로, 먼저 일반 빌드를 완료해 Cargo 의존성을 캐시에 준비해야 합니다. `cargo`가 PATH에 없다면 `--cargo`로 실행 파일 경로를 지정합니다.
 
-각 명령은 검증 디렉터리와 `verification.json`을 보존합니다. 실제 실행 보고서에는 바이너리 SHA-256, 실행 환경, 명령·종료 코드, 생성 경로와 파일 비교 결과를 기록합니다. 이 검사는 CLI의 선택·복사를 다루며 생성한 앱의 서버·HTTP·DI·LSP 종합 검증과 Rust CI 구성은 별도 작업입니다.
+각 명령은 검증 디렉터리와 `verification.json`을 보존합니다. 실제 실행 보고서에는 바이너리 SHA-256, 실행 환경, 명령·종료 코드, 생성 경로와 파일 비교 결과를 기록합니다. 이 검사는 CLI의 선택·복사를 다룹니다. 생성한 앱의 동작 검증은 아래 실행기를 사용합니다.
+
+## 생성 프로젝트 검증
+
+Node 24 이상, 템플릿이 지정한 pnpm, Rust stable 및 Python 3가 필요합니다. Rust 도구는 PATH에 등록합니다. 생성물 검증 실행기 자체는 Node 표준 모듈만 사용하며 저장소 루트에서 의존성을 설치할 필요가 없습니다.
+
+```sh
+cargo build --release --locked
+node --test tests/*.test.mjs
+node scripts/verify.mjs
+node scripts/verify.mjs next-fullstack
+node scripts/verify.mjs next-node-nest
+node scripts/verify.mjs next-static-nest
+```
+
+인자를 생략하면 세 템플릿을 순서대로 검증합니다. `--binary /absolute/path/personal-template`으로 빌드한 CLI를, `--output-dir /absolute/path/report`로 새 보고서 디렉터리를 지정할 수 있습니다. 기존 보고서 디렉터리는 덮어쓰지 않습니다. 성공은 종료 코드 `0`, 검증·환경 실패는 `1`, 잘못된 인자는 `2`입니다.
+
+각 기본 검사와 독립 사례는 OS 임시 디렉터리에 CLI로 새 프로젝트를 생성하고, 원본과 전체 파일의 hash를 비교한 뒤 잠금 파일 기준으로 설치합니다. Git 작업 폴더 안을 가리키는 임시 경로는 거부합니다. pnpm 버전은 생성 프로젝트의 `packageManager`와 대조합니다. pnpm 저장소 캐시는 재사용하지만 관리 저장소나 다른 생성물의 `node_modules`는 복사하지 않습니다.
+
+검증 범위는 루트·앱별 lint·포맷·타입·빌드, 정상 및 규칙 위반 fixture, Next 서버·클라이언트와 분리형 웹의 접근 경계, 정적 export, HTTP health, Nest DI metadata·자동수정 전후 동작과 native LSP입니다. Next 타입 검사는 기존 lint에 포함됩니다. LSP는 생성물의 폴더별 설정을 읽고 웹의 타입 기반 진단과 API의 일반 진단을 구분합니다. 사례 입력은 `tests/fixtures`에만 있으며 복사용 템플릿에 포함되지 않습니다.
+
+기본 보고서는 `.cache/verification/<실행 ID>/results.json`에 저장됩니다. 명령, 종료 코드, 필수·금지 진단, 로그 경로, 실행 시간, 소스·바이너리·설정·잠금 파일 hash와 도구 버전을 기록합니다. 예상 실패는 종료 코드와 지정 진단을 모두 충족해야 하며, timeout·signal·실행 불가는 통과로 처리하지 않습니다. 선행 검사가 실패하면 의존 검사는 `not_run`, 전체 실행은 실패입니다.
+
+성공한 생성물은 삭제하고 실패한 생성물은 보존합니다. 보고서에 원래 경로를 남기고, 의존성·빌드 캐시·비공개 환경 파일을 제외한 소스와 숨김 설정, fixture 및 사례 명세를 `*.tar.gz`로 보관합니다. tar를 별도 디렉터리에 풀고 `project`에서 `pnpm install --frozen-lockfile` 후 보고서의 명령을 실행하면 실패를 재현할 수 있습니다. 산출물 제외 사례의 `.next`·`dist` 등은 별도로 보존된 `fixture`를 다시 덮어쓴 뒤 검사합니다.
+
+실행기 전체 제한시간은 45분이며 설치·빌드는 최대 10분, 일반 명령은 2분, 서버 준비는 60초, LSP 요청은 30초입니다. 각 제한은 남은 전체 예산을 넘지 못합니다. 종료 요청이나 시간 초과 시 실행기가 만든 프로세스를 정리하고 결과를 기록합니다. 운영체제의 강제 종료나 runner 자체 소실은 보고서 보존을 보장하지 않습니다.
+
+GitHub Actions는 기존 기본 검사와 함께 Rust 검사·실행기 테스트·내장 파일 검증을 실행합니다. 같은 실행에서 빌드한 Linux 바이너리로 템플릿별 전체 검증을 수행하고 로그·보고서·실패 snapshot을 14일 보관합니다. 실행 step은 50분, job은 60분으로 보고서 업로드 시간을 확보합니다. Linux CI와 macOS 로컬 실행을 대상으로 하며, macOS 전용 `verify_cli.py`는 Linux job에서 실행하지 않습니다.
+
+실제 VS Code UI, 브라우저 E2E, Windows, 별도 저장소에 복사한 workflow와 실제 배포 환경은 이 실행기의 검증 범위에 포함되지 않습니다. 로컬 실행 결과와 실제 원격 Actions 결과는 구분해서 확인합니다.
