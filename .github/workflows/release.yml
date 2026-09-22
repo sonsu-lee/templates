@@ -1,4 +1,4 @@
-name: Publish seed package
+name: Publish seed CLI
 
 on:
   pull_request:
@@ -6,6 +6,7 @@ on:
       - .github/workflows/release.yml
       - package.json
       - scripts/verify-package.mjs
+      - install.sh
       - "bin/**"
       - Cargo.toml
       - Cargo.lock
@@ -13,6 +14,8 @@ on:
       - "src/**"
       - "templates/**"
       - README.md
+      - README.ko.md
+      - README.ja.md
   push:
     tags:
       - "v*"
@@ -125,6 +128,28 @@ jobs:
           merge-multiple: true
       - name: Preserve native executable modes
         run: chmod +x native/*/seed
+      - name: Assemble native release assets
+        run: |
+          mkdir -p .cache/release
+          for target in darwin-arm64 darwin-x64 linux-arm64 linux-x64; do
+            tar -czf ".cache/release/seed-$target.tar.gz" -C "native/$target" seed
+          done
+          (
+            cd native/win32-x64
+            zip "$GITHUB_WORKSPACE/.cache/release/seed-win32-x64.zip" seed.exe
+          )
+          (
+            cd .cache/release
+            sha256sum seed-* > SHA256SUMS
+          )
+      - name: Smoke test public installer
+        run: |
+          release_base="$(python3 -c 'from pathlib import Path; print(Path(".cache/release").resolve().as_uri())')"
+          SEED_RELEASE_BASE_URL="$release_base" \
+            SEED_INSTALL_DIR="$RUNNER_TEMP/seed-installer" \
+            ./install.sh
+          test "$("$RUNNER_TEMP/seed-installer/seed" --version)" = "seed $(node -p 'require("./package.json").version') (source $GITHUB_SHA)"
+          "$RUNNER_TEMP/seed-installer/seed" template list
       - name: Pack and inspect npm package
         run: |
           mkdir -p .cache/npm
@@ -142,8 +167,15 @@ jobs:
       - name: Upload npm package
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: seed-npm-package
+          name: templates-npm-package
           path: .cache/npm/*.tgz
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload native release assets
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: seed-release-assets
+          path: .cache/release/
           if-no-files-found: error
           retention-days: 7
 
@@ -165,9 +197,36 @@ jobs:
           scope: "@sonsu-lee"
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: seed-npm-package
+          name: templates-npm-package
           path: .cache/npm
       - name: Publish package
         run: npm publish .cache/npm/*.tgz --registry https://npm.pkg.github.com
         env:
           NODE_AUTH_TOKEN: ${{ github.token }}
+
+  release:
+    name: Publish GitHub Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: seed-release-assets
+          path: .cache/release
+      - name: Publish release assets
+        run: |
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" .cache/release/* --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$GITHUB_REF_NAME" .cache/release/* \
+              --verify-tag \
+              --title "seed $GITHUB_REF_NAME" \
+              --generate-notes \
+              --repo "$GITHUB_REPOSITORY"
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}

@@ -14,17 +14,17 @@ This repository provides three embedded Next.js project templates for personal a
 
 ## Requirements
 
-Installing the private `@sonsu-lee/seed` package requires Node.js 24 or newer, npm, and a GitHub personal access token (classic) with `read:packages`. Generated projects require pnpm 12.3.4. The package includes native binaries for macOS 15 and Ubuntu 24.04 on arm64 and x64, plus Windows x64 validated on the `windows-2025` runner. Other platforms and older operating-system releases are not supported or verified.
+The public installer requires `curl` and `tar` on macOS 15 or Ubuntu 24.04, on arm64 or x64. It installs the native CLI without Node.js or Rust. Generated projects require Node.js 24 or newer and pnpm 12.3.4. Windows x64 remains available through the authenticated `@sonsu-lee/templates` GitHub Package. Other platforms and older operating-system releases are not supported or verified.
 
 Building the CLI from source requires Rust stable. `rustfmt` and Clippy are needed only for the development checks.
 
 ## Quick Start
 
-Create a [personal access token (classic)](https://github.com/settings/tokens) with `read:packages`, then run these commands in a POSIX shell or PowerShell. Enter your GitHub username and use the token as the password when `npm login` prompts.
+Run the public installer from a POSIX shell, then create and start a project:
 
 ```sh
-npm login --scope=@sonsu-lee --auth-type=legacy --registry=https://npm.pkg.github.com
-npm install --global @sonsu-lee/seed
+curl -fsSL https://raw.githubusercontent.com/sonsu-lee/templates/main/install.sh | sh
+export PATH="$HOME/.local/bin:$PATH"
 seed --version
 seed template create "$HOME/my-app" --template next
 cd "$HOME/my-app"
@@ -32,7 +32,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-The web app is available at <http://localhost:3000>. See the generated README for template-specific environment and deployment details. Run `npm update --global @sonsu-lee/seed` to update the CLI.
+The web app is available at <http://localhost:3000>. See the generated README for template-specific environment and deployment details. Rerun the installer to update the CLI. Set `SEED_VERSION=v0.1.1` before running it to install that exact release. As an alternative, authenticated GitHub Packages users can install `@sonsu-lee/templates`.
 
 ## CLI Usage
 
@@ -48,7 +48,7 @@ seed template create ../my-static --template next-nest --web static
 
 The destination's parent must exist. An existing file, directory, or symlink is never overwritten. If copying fails, the CLI attempts to remove only the incomplete directory created by that invocation and reports if cleanup also fails.
 
-The npm package contains the native CLI and embedded templates. After installation, project creation needs Node.js to launch the native binary but needs no Rust, pnpm, source repository, or network. It copies the template configuration, lockfile, README, and `.env.example`, but does not install dependencies, initialize Git, rename packages, or add an ORM or plugins. A new package version is required after editing a template.
+The installer downloads a checksum-verified native binary whose templates are embedded. After installation, project creation needs no Node.js, Rust, pnpm, source repository, or network. It copies the template configuration, lockfile, README, and `.env.example`, but does not install dependencies, initialize Git, rename packages, or add an ORM or plugins. A new release is required after editing a template.
 
 ## Development
 
@@ -59,6 +59,7 @@ cargo fmt --check
 cargo clippy --locked --all-targets -- -D warnings
 cargo test --locked
 SEED_SOURCE_REVISION="$(git rev-parse HEAD)" cargo build --release --locked
+sh -n install.sh
 node --check bin/seed.mjs
 node --test tests/*.test.mjs
 node scripts/verify.mjs
@@ -66,4 +67,4 @@ node scripts/verify.mjs
 
 `node scripts/verify.mjs` creates and validates all three generated templates. Local builds without `SEED_SOURCE_REVISION` report `source local`.
 
-Tags must match both the Cargo and npm package versions, for example `v0.1.0`. Pushing a matching tag runs `.github/workflows/release.yml`, which builds and smoke-tests five native binaries, assembles them behind the `seed` launcher, and publishes the single private `@sonsu-lee/seed` package to GitHub Packages. The package version, source commit shown by `seed --version`, and embedded templates all refer to the same repository revision.
+Tags must match both the Cargo and npm package versions, for example `v0.1.1`. Pushing a matching tag runs `.github/workflows/release.yml`, which builds and smoke-tests five native binaries, publishes checksum-protected archives in a public GitHub Release, and publishes the authenticated `@sonsu-lee/templates` package to GitHub Packages. The release version, source commit shown by `seed --version`, and embedded templates all refer to the same repository revision.

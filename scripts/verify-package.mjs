@@ -12,7 +12,7 @@ const manifest = JSON.parse(readFileSync(resolve("package.json"), "utf8"));
 const reports = JSON.parse(readFileSync(resolve(reportPath), "utf8"));
 assert.equal(reports.length, 1, "npm pack must produce exactly one package");
 const [report] = reports;
-assert.equal(report.name, "@sonsu-lee/seed");
+assert.equal(report.name, "@sonsu-lee/templates");
 assert.equal(report.version, manifest.version);
 
 const files = new Map(report.files.map((file) => [file.path, file]));
