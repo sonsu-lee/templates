@@ -1,10 +1,11 @@
 import { NestFactory } from '@nestjs/core';
+import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
   app.enableShutdownHooks();
   app.enableCors({ origin: process.env.WEB_ORIGIN ?? 'http://localhost:3000' });
   const config = new DocumentBuilder()

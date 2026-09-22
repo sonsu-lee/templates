@@ -1,4 +1,5 @@
 saveExact: true
+autoInstallPeers: false
 
 packages:
   - apps/*
