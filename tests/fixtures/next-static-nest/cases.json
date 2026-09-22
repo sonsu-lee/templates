@@ -131,6 +131,10 @@
             },
             {
               "rule": "no-restricted-imports",
+              "message": "'node:sqlite'"
+            },
+            {
+              "rule": "no-restricted-imports",
               "message": "'next/headers'"
             },
             {

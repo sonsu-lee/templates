@@ -50,6 +50,10 @@
             {
               "rule": "no-restricted-imports",
               "message": "'pg'"
+            },
+            {
+              "rule": "no-restricted-imports",
+              "message": "'node:sqlite'"
             }
           ]
         }
