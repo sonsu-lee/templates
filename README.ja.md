@@ -45,6 +45,8 @@ Web アプリは <http://localhost:3000> で利用できます。テンプレー
 
 ## 開発
 
+`Git` を利用できる macOS または Linux の Git チェックアウトで、これらのチェックを実行してください。
+
 ```sh
 cargo fmt --check
 cargo clippy --locked --all-targets -- -D warnings

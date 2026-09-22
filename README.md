@@ -45,6 +45,8 @@ The binary embeds the templates, so after it is built, project creation needs no
 
 ## Development
 
+Run these checks from a Git checkout on macOS or Linux with Git available.
+
 ```sh
 cargo fmt --check
 cargo clippy --locked --all-targets -- -D warnings

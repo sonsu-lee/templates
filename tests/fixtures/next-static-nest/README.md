@@ -17,4 +17,4 @@ node scripts/verify.mjs next-static-nest
 - `safe-fix`: `pnpm lint:fix` 전후 타입 검사·빌드·DI metadata·HTTP health와 자동수정의 반복 안정성을 확인합니다.
 - `allowed-code`: 스크립트의 동기 Node API, 서버의 비동기 Node API와 클라이언트의 HTTP 호출을 허용하는지 확인합니다.
 
-다른 템플릿의 사례 명세는 공통 입력을 `fixture` 경로로 참조할 수 있습니다. 입력과 실행기는 관리 저장소에만 있으며 생성 프로젝트에는 포함되지 않습니다. 결과와 재현 방법은 저장소 루트 README를 참고하세요.
+다른 템플릿의 사례 명세는 공통 입력을 `fixture` 경로로 참조할 수 있습니다. 입력과 실행기는 관리 저장소에만 있으며 생성 프로젝트에는 포함되지 않습니다. 실행 결과는 명령 출력의 `RESULT` 경로에서 확인합니다. 실패한 사례의 재현용 snapshot은 해당 보고서 디렉터리에 보존됩니다.

@@ -45,6 +45,8 @@ pnpm dev
 
 ## 개발
 
+`Git`을 사용할 수 있는 macOS 또는 Linux의 Git 체크아웃에서 이 검사를 실행하세요.
+
 ```sh
 cargo fmt --check
 cargo clippy --locked --all-targets -- -D warnings
