@@ -2,7 +2,7 @@
 
 [English](README.md) | [한국어](README.ko.md) | **日本語**
 
-このリポジトリは、個人用アプリケーション向けに 3 種類の Next.js プロジェクトテンプレートをバイナリへ組み込んで提供します。テンプレートでは StyleX、Oxlint、Oxfmt を使用しています。
+`seed` CLI を使い、組み込み済みの 3 種類の Next.js テンプレートから個人用アプリケーションプロジェクトを作成します。
 
 ## テンプレート
 
@@ -14,13 +14,11 @@
 
 ## 必要条件
 
-公開インストーラーは、arm64 または x64 の macOS 15 と Ubuntu 24.04 で `curl` と `tar` を使用します。Node.js や Rust を必要とせず、ネイティブ CLI をインストールします。生成されたプロジェクトには Node.js 24 以降と pnpm 12.3.4 が必要です。Windows x64 は、認証が必要な `@sonsu-lee/templates` GitHub Package で引き続き提供します。その他のプラットフォームと古い OS リリースはサポートまたは検証していません。
+インストーラーは arm64 と x64 の macOS 15 および Ubuntu 24.04 をサポートし、`curl` と `tar` を使用します。生成されたプロジェクトには Node.js 24 以降と pnpm 12.3.4 が必要です。Windows x64 バイナリは GitHub Releases から入手できます。
 
-ソースから CLI をビルドするには Rust stable が必要です。`rustfmt` と Clippy は開発時のチェックにのみ必要です。
+Rust stable、`rustfmt`、Clippy は開発時にのみ必要です。
 
 ## クイックスタート
-
-POSIX shell で公開インストーラーを実行し、プロジェクトを作成して起動してください。
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/sonsu-lee/templates/main/install.sh | sh
@@ -32,7 +30,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Web アプリは <http://localhost:3000> で利用できます。テンプレート固有の環境設定とデプロイの詳細は、生成された README を参照してください。CLI を更新するにはインストーラーを再実行します。特定のリリースをインストールするには、実行前に `SEED_VERSION=v0.1.1` を設定してください。代替手段として、認証済みの GitHub Packages ユーザーは `@sonsu-lee/templates` をインストールできます。
+<http://localhost:3000> を開いてください。`seed` を更新するにはインストーラーを再実行します。特定のリリースをインストールするには、`curl -fsSL https://raw.githubusercontent.com/sonsu-lee/templates/main/install.sh | SEED_VERSION=v0.1.1 sh` を使用してください。
 
 ## CLI の使い方
 
@@ -44,15 +42,11 @@ seed template create ../my-service --template next-nest --web node
 seed template create ../my-static --template next-nest --web static
 ```
 
-`--version` は、パッケージバージョンと公開ワークフローが組み込んだソースコミットの両方を表示します。ターミナルで `seed template create` の `--template` を省略するとアーキテクチャのメニューが開き、Next.js と NestJS を選択した場合はデプロイのメニューも開きます。`--web` なしで `--template next-nest` を指定すると Node が選択されます。非ターミナルでの実行には `--template` が必要です。プロジェクトを作成せずにキャンセルするには Esc または `q` を押してください。
+`--template` なしで `seed template create` を実行すると対話メニューが開きます。`--web` なしで `--template next-nest` を指定すると、Node デプロイが既定値になります。
 
-作成先の親ディレクトリは存在している必要があります。既存のファイル、ディレクトリ、symlink は上書きされません。コピーに失敗した場合、CLI はその実行で作成した未完成のディレクトリだけを削除しようとし、クリーンアップにも失敗した場合はその旨を報告します。
-
-インストーラーは checksum で検証されたネイティブバイナリをダウンロードし、テンプレートはそのバイナリに組み込まれています。インストール後のプロジェクト作成には Node.js、Rust、pnpm、ソースリポジトリ、ネットワークは不要です。テンプレートの設定、ロックファイル、README、`.env.example` はコピーされますが、依存関係のインストール、Git の初期化、パッケージ名の変更、ORM やプラグインの追加は行われません。テンプレートを編集した後は新しいリリースが必要です。
+作成先の親ディレクトリは存在している必要があり、既存のパスは上書きされません。テンプレートはバイナリに組み込まれているため、プロジェクト作成はオフラインで動作し、依存関係のインストールや Git の初期化は行いません。
 
 ## 開発
-
-Git を利用できる macOS または Linux の Git チェックアウトで、これらのチェックを実行してください。
 
 ```sh
 cargo fmt --check
@@ -65,6 +59,4 @@ node --test tests/*.test.mjs
 node scripts/verify.mjs
 ```
 
-`node scripts/verify.mjs` は、生成された 3 種類のテンプレートをすべて作成して検証します。`SEED_SOURCE_REVISION` なしでローカルビルドした場合は、`source local` と表示されます。
-
-タグは Cargo と npm の両方のパッケージバージョンと一致する必要があります（例: `v0.1.1`）。一致するタグを push すると `.github/workflows/release.yml` が 5 つのネイティブバイナリをビルドしてスモークテストし、checksum 付きアーカイブを公開 GitHub Release に公開し、認証が必要な `@sonsu-lee/templates` パッケージを GitHub Packages に公開します。リリースバージョン、`seed --version` が示すソースコミット、組み込みテンプレートは、すべて同じリポジトリリビジョンを参照します。
+`node scripts/verify.mjs` は 3 種類のテンプレートをすべて作成して検証します。Cargo と npm のバージョンに一致するタグを push すると、ネイティブリリースアーカイブ、`SHA256SUMS`、`@sonsu-lee/templates` が公開されます。
