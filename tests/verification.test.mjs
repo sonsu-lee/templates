@@ -183,6 +183,61 @@ test("cancellation reaps an owned child and records subsequent cases as not_run"
   assert.equal(suite.finish(), 1);
 });
 
+test("normal completion never signals a closed process group", async (t) => {
+  const dir = scratch(t);
+  const suite = new Suite(join(dir, "report"));
+  const original = process.kill.bind(process);
+  const groupSignals = [];
+  t.mock.method(process, "kill", (pid, signal) => {
+    if (pid < 0) {
+      groupSignals.push({ pid, signal });
+      throw Object.assign(new Error("closed group"), { code: "EPERM" });
+    }
+    return original(pid, signal);
+  });
+  const passed = await suite.case({ name: "normal" }, () =>
+    suite.run(dir, [process.execPath, "-e", ""]),
+  );
+  assert.equal(passed, true);
+  assert.deepEqual(groupSignals, []);
+  assert.equal(suite.report.error, undefined);
+  assert.equal(suite.finish(), 0);
+});
+
+test("normal completion terminates an unref'd descendant in its process group", async (t) => {
+  const dir = scratch(t);
+  const pidFile = join(dir, "descendant.pid");
+  const suite = new Suite(join(dir, "report"), { graceMs: 50 });
+  let descendant;
+  t.after(() => {
+    if (descendant) {
+      try {
+        process.kill(descendant, "SIGKILL");
+      } catch {}
+    }
+  });
+  const script = `const {spawn}=require('node:child_process');const {writeFileSync}=require('node:fs');const child=spawn(process.execPath,['-e','setInterval(()=>{},1000)'],{stdio:'ignore'});child.unref();writeFileSync(${JSON.stringify(pidFile)},String(child.pid));`;
+  const passed = await suite.case({ name: "descendant" }, () =>
+    suite.run(dir, [process.execPath, "-e", script]),
+  );
+  descendant = Number(readFileSync(pidFile, "utf8"));
+  assert.equal(passed, true);
+  assert.equal(suite.finish(), 0);
+  for (let attempt = 0; attempt < 30; attempt++) {
+    let state;
+    try {
+      state = execFileSync("ps", ["-o", "stat=", "-p", String(descendant)], {
+        encoding: "utf8",
+      }).trim();
+    } catch {
+      return;
+    }
+    if (state.startsWith("Z")) return;
+    await delay(20);
+  }
+  assert.fail("Descendant is still running after normal completion cleanup");
+});
+
 test("a denied process-group cleanup is recorded without losing the final report", async (t) => {
   const dir = scratch(t);
   const suite = new Suite(join(dir, "report"), { graceMs: 20 });
