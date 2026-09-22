@@ -1,4 +1,7 @@
 saveExact: true
+peerDependencyRules:
+  ignoreMissing:
+    - '@nestjs/platform-express'
 
 packages:
   - apps/*

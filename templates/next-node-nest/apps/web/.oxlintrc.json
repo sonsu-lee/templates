@@ -55,6 +55,7 @@
               "mysql2",
               "mysql2/**",
               "better-sqlite3",
+              "node:sqlite",
               "sqlite3",
               "@libsql/client",
               "@libsql/client/**",
@@ -122,41 +123,6 @@
         "nextjs/no-duplicate-head": "error",
         "nextjs/no-head-import-in-document": "error",
         "nextjs/no-script-component-in-head": "error",
-        "no-restricted-imports": [
-          "error",
-          {
-            "patterns": [
-              {
-                "group": [
-                  "@nestjs/*",
-                  "@template/api",
-                  "@template/api/**",
-                  "**/apps/api/**",
-                  "drizzle-orm",
-                  "drizzle-orm/**",
-                  "kysely",
-                  "kysely/**",
-                  "pg",
-                  "pg/**",
-                  "postgres",
-                  "postgres/**",
-                  "mysql2",
-                  "mysql2/**",
-                  "better-sqlite3",
-                  "sqlite3",
-                  "@libsql/client",
-                  "@libsql/client/**",
-                  "mongodb",
-                  "@prisma/client",
-                  "@prisma/client/**",
-                  "**/api/src/**",
-                  "**/api/dist/**"
-                ],
-                "message": "The Nest API owns backend implementation and database access."
-              }
-            ]
-          }
-        ],
         "jsx-a11y/alt-text": "error",
         "jsx-a11y/anchor-has-content": "error",
         "jsx-a11y/anchor-is-valid": "error",
