@@ -183,6 +183,27 @@ test("cancellation reaps an owned child and records subsequent cases as not_run"
   assert.equal(suite.finish(), 1);
 });
 
+test("normal completion never signals a closed process group", async (t) => {
+  const dir = scratch(t);
+  const suite = new Suite(join(dir, "report"));
+  const original = process.kill.bind(process);
+  const groupSignals = [];
+  t.mock.method(process, "kill", (pid, signal) => {
+    if (pid < 0) {
+      groupSignals.push({ pid, signal });
+      throw Object.assign(new Error("closed group"), { code: "EPERM" });
+    }
+    return original(pid, signal);
+  });
+  const passed = await suite.case({ name: "normal" }, () =>
+    suite.run(dir, [process.execPath, "-e", ""]),
+  );
+  assert.equal(passed, true);
+  assert.deepEqual(groupSignals, []);
+  assert.equal(suite.report.error, undefined);
+  assert.equal(suite.finish(), 0);
+});
+
 test("a denied process-group cleanup is recorded without losing the final report", async (t) => {
   const dir = scratch(t);
   const suite = new Suite(join(dir, "report"), { graceMs: 20 });

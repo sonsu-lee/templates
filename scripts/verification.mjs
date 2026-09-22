@@ -243,6 +243,8 @@ export class Suite {
     };
     const stop = () => {
       if (stopPromise) return stopPromise;
+      // Once close fires, the process group ID is no longer ours and may already be reused.
+      if (completed) return closed;
       stopped = true;
       stopPromise = (async () => {
         kill("SIGTERM");
