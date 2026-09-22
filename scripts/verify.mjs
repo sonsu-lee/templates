@@ -33,7 +33,7 @@ const source = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 export function parseArgs(args) {
   const result = {
     selected: Object.keys(templates),
-    binary: join(source, "target/release/personal-template"),
+    binary: join(source, "target/release/seed"),
   };
   let selected = false;
   const options = new Set();
@@ -162,7 +162,7 @@ export async function verify(options) {
     );
     assert.ok(Number(process.versions.node.split(".")[0]) >= 24, "Node 24 or later is required");
     const binary = realpathSync(options.binary);
-    scratch = realpathSync(mkdtempSync(join(tmpdir(), "personal-template-verify-")));
+    scratch = realpathSync(mkdtempSync(join(tmpdir(), "seed-verify-")));
     assertOutsideGit(scratch);
     Object.assign(suite.report, {
       source,
@@ -200,7 +200,7 @@ export async function verify(options) {
           async () => {
             const project = join(scratch, `${name}-${record.name}`);
             record.project = project;
-            await suite.run(scratch, [binary, "create", project, ...template.flags]);
+            await suite.run(scratch, [binary, "template", "create", project, ...template.flags]);
             assert.deepEqual(
               files(project),
               expectedSource,

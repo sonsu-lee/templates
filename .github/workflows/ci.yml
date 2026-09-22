@@ -128,7 +128,7 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: verification-cli-linux
-          path: target/release/personal-template
+          path: target/release/seed
           retention-days: 1
 
   generated:
@@ -161,8 +161,8 @@ jobs:
       - name: Verify generated projects
         timeout-minutes: 50
         run: |
-          chmod +x .cache/bin/personal-template
-          node scripts/verify.mjs "${{ matrix.template }}" --binary .cache/bin/personal-template --output-dir .cache/generated-report
+          chmod +x .cache/bin/seed
+          node scripts/verify.mjs "${{ matrix.template }}" --binary .cache/bin/seed --output-dir .cache/generated-report
       - name: Save verification evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
