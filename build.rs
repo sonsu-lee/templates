@@ -11,6 +11,17 @@ use std::path::PathBuf;
 fn main() {
     let manifest = PathBuf::from(env::var_os("CARGO_MANIFEST_DIR").unwrap());
     let output = PathBuf::from(env::var_os("OUT_DIR").unwrap()).join("embedded.rs");
+    println!("cargo:rerun-if-env-changed=PERSONAL_TEMPLATE_SOURCE_REVISION");
+    let source_revision =
+        env::var("PERSONAL_TEMPLATE_SOURCE_REVISION").unwrap_or_else(|_| "local".to_owned());
+    assert!(
+        !source_revision.is_empty()
+            && source_revision
+                .chars()
+                .all(|character| character.is_ascii_alphanumeric()),
+        "PERSONAL_TEMPLATE_SOURCE_REVISION must be non-empty ASCII alphanumeric text"
+    );
+    println!("cargo:rustc-env=PERSONAL_TEMPLATE_SOURCE_REVISION={source_revision}");
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=src/embedding.rs");
     println!("cargo:rerun-if-changed=src/templates.rs");

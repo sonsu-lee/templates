@@ -102,12 +102,7 @@ fn copies_all_three_templates_exactly() {
 #[test]
 fn lists_templates_and_help_without_writes() {
     let temp = tempfile::tempdir().unwrap();
-    for args in [
-        &["list"][..],
-        &["--help"],
-        &["create", "--help"],
-        &["--version"],
-    ] {
+    for args in [&["list"][..], &["--help"], &["create", "--help"]] {
         let output = run(temp.path(), args);
         assert_exit(&output, 0);
         assert!(!output.stdout.is_empty());
@@ -118,6 +113,21 @@ fn lists_templates_and_help_without_writes() {
         assert!(stdout.contains(name));
     }
     assert_eq!(fs::read_dir(temp.path()).unwrap().count(), 0);
+}
+
+#[test]
+fn version_identifies_the_package_and_embedded_source() {
+    let temp = tempfile::tempdir().unwrap();
+    let output = run(temp.path(), &["--version"]);
+    assert_exit(&output, 0);
+    assert_eq!(
+        String::from_utf8(output.stdout).unwrap(),
+        format!(
+            "personal-template {} (source {})\n",
+            env!("CARGO_PKG_VERSION"),
+            env!("PERSONAL_TEMPLATE_SOURCE_REVISION")
+        )
+    );
 }
 
 #[test]

@@ -9,7 +9,12 @@ use crate::templates::Template;
 
 #[derive(Parser, Debug)]
 #[command(
-    version,
+    version = concat!(
+        env!("CARGO_PKG_VERSION"),
+        " (source ",
+        env!("PERSONAL_TEMPLATE_SOURCE_REVISION"),
+        ")"
+    ),
     about = "Create an independent Next.js project from embedded templates"
 )]
 pub struct Cli {

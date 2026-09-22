@@ -1,0 +1,109 @@
+name: Release CLI
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/release.yml
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: Package / ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            target: aarch64-apple-darwin
+          - runner: macos-15-intel
+            target: x86_64-apple-darwin
+          - runner: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+          - runner: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Capture source revision
+        run: echo "PERSONAL_TEMPLATE_SOURCE_REVISION=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Set up Rust stable
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+          rustup target add "${{ matrix.target }}"
+      - name: Resolve and validate version
+        id: metadata
+        shell: bash
+        run: |
+          version="$(cargo metadata --no-deps --format-version 1 | python3 -c 'import json, sys; print(json.load(sys.stdin)["packages"][0]["version"])')"
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            test "${GITHUB_REF_NAME#v}" = "$version"
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - name: Build release binary
+        run: cargo build --release --locked --target "${{ matrix.target }}"
+      - name: Smoke test binary and embedded template
+        shell: bash
+        run: |
+          binary="target/${{ matrix.target }}/release/personal-template"
+          test "$("$binary" --version)" = "personal-template ${{ steps.metadata.outputs.version }} (source $PERSONAL_TEMPLATE_SOURCE_REVISION)"
+          "$binary" list
+          "$binary" create "$RUNNER_TEMP/generated" --template next
+          test -f "$RUNNER_TEMP/generated/package.json"
+          test -f "$RUNNER_TEMP/generated/pnpm-lock.yaml"
+      - name: Package release archive
+        id: package
+        shell: bash
+        run: |
+          version="${{ steps.metadata.outputs.version }}"
+          archive="personal-template-v${version}-${{ matrix.target }}.tar.gz"
+          mkdir -p .cache/release/package .cache/release/assets
+          cp "target/${{ matrix.target }}/release/personal-template" .cache/release/package/
+          tar -C .cache/release/package -czf ".cache/release/assets/$archive" personal-template
+          (cd .cache/release/assets && shasum -a 256 "$archive" > "$archive.sha256")
+      - name: Upload release archive
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-${{ matrix.target }}
+          path: .cache/release/assets/
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: Publish GitHub release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: release-*
+          path: dist
+          merge-multiple: true
+      - name: Create checksums manifest
+        working-directory: dist
+        run: cat -- *.sha256 | sort --key=2 > SHA256SUMS
+      - name: Publish release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" dist/* \
+              --repo "$GITHUB_REPOSITORY" \
+              --verify-tag \
+              --generate-notes \
+              --title "personal-template $GITHUB_REF_NAME"
+          fi
