@@ -25,20 +25,30 @@ if (executable === undefined) {
       ? ["SIGINT", "SIGTERM", "SIGBREAK"]
       : ["SIGHUP", "SIGINT", "SIGTERM"];
 
+  const signalHandlers = new Map();
   for (const signal of forwardedSignals) {
-    process.on(signal, () => {
+    const handler = () => {
       if (child.exitCode === null && child.signalCode === null) {
         child.kill(signal);
       }
-    });
+    };
+    signalHandlers.set(signal, handler);
+    process.on(signal, handler);
   }
+  const removeSignalHandlers = () => {
+    for (const [signal, handler] of signalHandlers) {
+      process.off(signal, handler);
+    }
+  };
 
   child.once("error", (error) => {
+    removeSignalHandlers();
     spawnFailed = true;
     console.error(`Unable to start seed for ${platform}: ${error.message}`);
     process.exitCode = 1;
   });
   child.once("exit", (code, signal) => {
+    removeSignalHandlers();
     if (spawnFailed) return;
     if (signal !== null && process.platform !== "win32") {
       process.kill(process.pid, signal);
