@@ -20,6 +20,18 @@ if (executable === undefined) {
   const binary = fileURLToPath(new URL(`../native/${executable}`, import.meta.url));
   const child = spawn(binary, process.argv.slice(2), { stdio: "inherit" });
   let spawnFailed = false;
+  const forwardedSignals =
+    process.platform === "win32"
+      ? ["SIGINT", "SIGTERM", "SIGBREAK"]
+      : ["SIGHUP", "SIGINT", "SIGTERM"];
+
+  for (const signal of forwardedSignals) {
+    process.on(signal, () => {
+      if (child.exitCode === null && child.signalCode === null) {
+        child.kill(signal);
+      }
+    });
+  }
 
   child.once("error", (error) => {
     spawnFailed = true;
