@@ -57,6 +57,19 @@ export function trackedFiles(source, path) {
     .filter(Boolean);
 }
 
+function activeProcessGroupMembers(group) {
+  const output = execFileSync("ps", ["-axo", "pid=,pgid=,stat="], {
+    encoding: "utf8",
+    timeout: 10000,
+  }).trim();
+  if (!output) return [];
+  return output
+    .split("\n")
+    .map((line) => line.trim().split(/\s+/, 3))
+    .filter(([, pgid, state]) => Number(pgid) === group && !state.startsWith("Z"))
+    .map(([pid]) => Number(pid));
+}
+
 export function sourceFiles(source, template) {
   const prefix = `templates/${template}/`;
   const entries = trackedFiles(source, prefix);
@@ -241,10 +254,44 @@ export class Suite {
       clearTimeout(waitTimer);
       return completed;
     };
+    const inspectGroup = () => {
+      try {
+        return activeProcessGroupMembers(child.pid);
+      } catch (error) {
+        record.error = `Process group inspection failed: ${error.code ?? error.message}`;
+        this.report.error = record.error;
+        this.save();
+        return null;
+      }
+    };
+    const waitForGroupExit = async () => {
+      const deadline = performance.now() + this.graceMs;
+      for (;;) {
+        const members = inspectGroup();
+        if (members === null || members.length === 0) return members !== null;
+        const remaining = deadline - performance.now();
+        if (remaining <= 0) return false;
+        await new Promise((done) => setTimeout(done, Math.min(20, remaining)));
+      }
+    };
     const stop = () => {
       if (stopPromise) return stopPromise;
-      // Once close fires, the process group ID is no longer ours and may already be reused.
-      if (completed) return closed;
+      if (completed) {
+        stopPromise = (async () => {
+          const members = inspectGroup();
+          if (members === null || members.length === 0) return;
+          kill("SIGTERM");
+          if (await waitForGroupExit()) return;
+          kill("SIGKILL");
+          if (!(await waitForGroupExit())) {
+            record.cleanupIncomplete = true;
+            record.error = `${record.error ?? "Process cleanup failed"}; descendants remained after close`;
+            this.report.error = record.error;
+            this.save();
+          }
+        })();
+        return stopPromise;
+      }
       stopped = true;
       stopPromise = (async () => {
         kill("SIGTERM");
