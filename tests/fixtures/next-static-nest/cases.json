@@ -95,6 +95,10 @@
             {
               "rule": "no-restricted-imports",
               "message": "'pg'"
+            },
+            {
+              "rule": "no-restricted-imports",
+              "message": "'node:sqlite'"
             }
           ],
           "apps/web/scripts/blocked.mjs": [

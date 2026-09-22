@@ -27,7 +27,12 @@
         "diagnostics": ["no-restricted-imports", "no-require-imports"],
         "outputs": {},
         "diagnosticFiles": {
-          "apps/web/blocked.config.mjs": ["no-restricted-imports"],
+          "apps/web/blocked.config.mjs": [
+            {
+              "rule": "no-restricted-imports",
+              "message": "'node:sqlite'"
+            }
+          ],
           "apps/web/scripts/blocked.mjs": ["no-restricted-imports"],
           "apps/web/src/blocked-require.js": ["no-require-imports"],
           "apps/web/src/blocked.ts": [
