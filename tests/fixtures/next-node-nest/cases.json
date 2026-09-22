@@ -27,7 +27,20 @@
         "diagnostics": ["no-restricted-imports", "no-require-imports"],
         "outputs": {},
         "diagnosticFiles": {
-          "apps/web/scripts/blocked.mjs": ["no-restricted-imports"],
+          "apps/web/scripts/blocked.mjs": [
+            {
+              "rule": "no-restricted-imports",
+              "message": "'../../api/src/health.service'"
+            },
+            {
+              "rule": "no-restricted-imports",
+              "message": "'node:sqlite'"
+            },
+            {
+              "rule": "no-restricted-imports",
+              "message": "'pg'"
+            }
+          ],
           "apps/web/src/blocked-require.js": ["no-require-imports"],
           "apps/web/src/blocked.ts": [
             {

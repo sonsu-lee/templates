@@ -95,6 +95,14 @@
             {
               "rule": "no-restricted-imports",
               "message": "'../../api/src/health.service'"
+            },
+            {
+              "rule": "no-restricted-imports",
+              "message": "'node:sqlite'"
+            },
+            {
+              "rule": "no-restricted-imports",
+              "message": "'pg'"
             }
           ],
           "apps/web/src/blocked-require.js": ["no-require-imports"],
