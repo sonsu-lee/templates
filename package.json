@@ -1,0 +1,24 @@
+{
+  "name": "@sonsu-lee/seed",
+  "version": "0.1.0",
+  "description": "Personal development CLI for creating and managing application projects",
+  "type": "module",
+  "bin": {
+    "seed": "bin/seed.mjs"
+  },
+  "files": [
+    "bin/",
+    "native/"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sonsu-lee/templates.git"
+  },
+  "license": "UNLICENSED",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  }
+}

@@ -9,8 +9,13 @@ use crate::templates::Template;
 
 #[derive(Parser, Debug)]
 #[command(
-    version,
-    about = "Create an independent Next.js project from embedded templates"
+    version = concat!(
+        env!("CARGO_PKG_VERSION"),
+        " (source ",
+        env!("SEED_SOURCE_REVISION"),
+        ")"
+    ),
+    about = "Manage personal application projects and development workflows"
 )]
 pub struct Cli {
     #[command(subcommand)]
@@ -19,6 +24,15 @@ pub struct Cli {
 
 #[derive(Subcommand, Debug)]
 pub enum Commands {
+    /// Work with embedded project templates
+    Template {
+        #[command(subcommand)]
+        command: TemplateCommands,
+    },
+}
+
+#[derive(Subcommand, Debug)]
+pub enum TemplateCommands {
     /// List available templates and their explicit selection options
     List,
     /// Copy a template into a new directory (its parent must already exist)

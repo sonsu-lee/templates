@@ -114,8 +114,8 @@ def main():
     else:
         parent = Path.home() / "tmp"
         parent.mkdir(exist_ok=True)
-        output = Path(tempfile.mkdtemp(prefix="personal-template-issue4.", dir=parent))
-    binary = output / "personal-template"
+        output = Path(tempfile.mkdtemp(prefix="seed-issue4.", dir=parent))
+    binary = output / "seed"
     shutil.copy2(args.binary.resolve(), binary)
     report = {
         "source": str(SOURCE), "directory": str(output),
@@ -147,7 +147,7 @@ def main():
 
     try:
         run(["--help"])
-        listing = run(["list"])
+        listing = run(["template", "list"])
         variants = [
             ("next-app", "next-fullstack", ["--template", "next"]),
             ("node-service", "next-node-nest", ["--template", "next-nest", "--web", "node"]),
@@ -156,17 +156,17 @@ def main():
         ]
         for name, template, flags in variants:
             assert template in listing.stdout
-            run(["create", name, *flags])
+            run(["template", "create", name, *flags])
             compare(name, template)
-        run(["create", "bad", "--template", "next", "--web", "static"], 2, "static")
-        run(["create", "missing-option"], 2, "--template")
-        run(["create", "next-app", "--template", "next"], 1, "already exists")
+        run(["template", "create", "bad", "--template", "next", "--web", "static"], 2, "static")
+        run(["template", "create", "missing-option"], 2, "--template")
+        run(["template", "create", "next-app", "--template", "next"], 1, "already exists")
         compare("next-app", "next-fullstack")
         assert not (output / "bad").exists()
         assert not (output / "missing-option").exists()
         for name, target in [("valid-link", "next-app"), ("dangling-link", "absent")]:
             (output / name).symlink_to(target)
-            run(["create", name, "--template", "next"], 1, "already exists")
+            run(["template", "create", name, "--template", "next"], 1, "already exists")
             assert os.readlink(output / name) == target
         assert not (output / "absent").exists()
 
@@ -177,16 +177,16 @@ def main():
             ("interactive-web-option", "next-static-nest", ["--web", "static"], [("Architecture", b"\x1b[B\r")]),
             ("interactive-explicit", "next-node-nest", ["--template", "next-nest"], []),
         ]:
-            run_pty(binary, output, ["create", name, *flags], keys, 0, report["commands"])
+            run_pty(binary, output, ["template", "create", name, *flags], keys, 0, report["commands"])
             compare(name, template)
         for name, steps in [
             ("cancel-escape", [("Architecture", b"\x1b")]),
             ("cancel-q", [("Architecture", b"q")]),
             ("cancel-web", [("Architecture", b"\x1b[B\r"), ("Web deployment", b"q")]),
         ]:
-            run_pty(binary, output, ["create", name], steps, 130, report["commands"])
+            run_pty(binary, output, ["template", "create", name], steps, 130, report["commands"])
             assert not (output / name).exists()
-        run_pty(binary, output, ["create", "closed-terminal"], [], 1,
+        run_pty(binary, output, ["template", "create", "closed-terminal"], [], 1,
                 report["commands"], close_input=True)
         assert not (output / "closed-terminal").exists()
 
@@ -215,7 +215,7 @@ def main():
             assert completed.returncode != 0 and diagnostic in completed.stderr, record
         for name, template, flags in variants[:3]:
             name = "offline-" + name
-            run(["create", name, *flags], prefix=prefix)
+            run(["template", "create", name, *flags], prefix=prefix)
             compare(name, template)
         report["status"] = "passed"
     except BaseException as error:

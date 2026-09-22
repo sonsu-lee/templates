@@ -202,15 +202,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "384b8ab6d37215f3c5301a95a4accb5d64aa607f1fcb26a11b5303878451b4fe"
 
 [[package]]
-name = "personal-template"
-version = "0.1.0"
-dependencies = [
- "clap",
- "dialoguer",
- "tempfile",
-]
-
-[[package]]
 name = "proc-macro2"
 version = "1.0.107"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -245,6 +236,15 @@ dependencies = [
  "libc",
  "linux-raw-sys",
  "windows-sys",
+]
+
+[[package]]
+name = "seed"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "dialoguer",
+ "tempfile",
 ]
 
 [[package]]

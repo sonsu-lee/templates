@@ -1,0 +1,173 @@
+name: Publish seed package
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/release.yml
+      - package.json
+      - scripts/verify-package.mjs
+      - "bin/**"
+      - Cargo.toml
+      - Cargo.lock
+      - build.rs
+      - "src/**"
+      - "templates/**"
+      - README.md
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  native:
+    name: Native / ${{ matrix.platform }}-${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            target: aarch64-apple-darwin
+            platform: darwin
+            arch: arm64
+            executable: seed
+          - runner: macos-15-intel
+            target: x86_64-apple-darwin
+            platform: darwin
+            arch: x64
+            executable: seed
+          - runner: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            platform: linux
+            arch: arm64
+            executable: seed
+          - runner: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+            platform: linux
+            arch: x64
+            executable: seed
+          - runner: windows-2025
+            target: x86_64-pc-windows-msvc
+            platform: win32
+            arch: x64
+            executable: seed.exe
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Capture source revision
+        run: echo "SEED_SOURCE_REVISION=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Set up Rust stable
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+          rustup target add "${{ matrix.target }}"
+      - name: Resolve and validate version
+        id: metadata
+        run: |
+          cargo_version="$(cargo metadata --no-deps --format-version 1 | node -e 'let input = ""; process.stdin.on("data", chunk => input += chunk).on("end", () => console.log(JSON.parse(input).packages[0].version))')"
+          package_version="$(node -p 'require("./package.json").version')"
+          test "$cargo_version" = "$package_version"
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            test "${GITHUB_REF_NAME#v}" = "$package_version"
+          fi
+          echo "version=$package_version" >> "$GITHUB_OUTPUT"
+      - name: Build native binary
+        run: cargo build --release --locked --target "${{ matrix.target }}"
+      - name: Smoke test native binary and embedded template
+        run: |
+          binary="target/${{ matrix.target }}/release/${{ matrix.executable }}"
+          test "$("$binary" --version)" = "seed ${{ steps.metadata.outputs.version }} (source $SEED_SOURCE_REVISION)"
+          "$binary" template list
+          "$binary" template create "$RUNNER_TEMP/generated" --template next
+          test -f "$RUNNER_TEMP/generated/package.json"
+          test -f "$RUNNER_TEMP/generated/pnpm-lock.yaml"
+      - name: Stage native binary
+        run: |
+          destination=".cache/package/native/${{ matrix.platform }}-${{ matrix.arch }}"
+          mkdir -p "$destination"
+          cp "target/${{ matrix.target }}/release/${{ matrix.executable }}" "$destination/${{ matrix.executable }}"
+      - name: Upload native binary
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: native-${{ matrix.platform }}-${{ matrix.arch }}
+          path: .cache/package/
+          if-no-files-found: error
+          retention-days: 1
+
+  package:
+    name: Assemble npm package
+    needs: native
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: native-*
+          path: .
+          merge-multiple: true
+      - name: Preserve native executable modes
+        run: chmod +x native/*/seed
+      - name: Pack and inspect npm package
+        run: |
+          mkdir -p .cache/npm
+          npm pack --json --pack-destination .cache/npm > .cache/npm-pack.json
+          node scripts/verify-package.mjs .cache/npm-pack.json
+      - name: Smoke test installed npm package
+        run: |
+          tarball="$PWD/.cache/npm/$(node -e 'const report = require("./.cache/npm-pack.json"); console.log(report[0].filename)')"
+          npm install --prefix "$RUNNER_TEMP/seed-package" "$tarball"
+          seed="$RUNNER_TEMP/seed-package/node_modules/.bin/seed"
+          test "$("$seed" --version)" = "seed $(node -p 'require("./package.json").version') (source $GITHUB_SHA)"
+          "$seed" template list
+          "$seed" template create "$RUNNER_TEMP/generated-from-package" --template next
+          test -f "$RUNNER_TEMP/generated-from-package/package.json"
+      - name: Upload npm package
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: seed-npm-package
+          path: .cache/npm/*.tgz
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: Publish GitHub Package
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+          registry-url: https://npm.pkg.github.com
+          scope: "@sonsu-lee"
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: seed-npm-package
+          path: .cache/npm
+      - name: Publish package
+        run: npm publish .cache/npm/*.tgz --registry https://npm.pkg.github.com
+        env:
+          NODE_AUTH_TOKEN: ${{ github.token }}
