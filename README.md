@@ -39,7 +39,7 @@ The web app is available at <http://localhost:3000>. See the generated README fo
 
 Omitting `--template` in a terminal opens an architecture menu and, for Next.js plus NestJS, a deployment menu. `--template next-nest` without `--web` selects Node. Non-terminal execution requires `--template`. Press Esc or `q` to cancel without creating a project.
 
-The destination's parent must exist. An existing file, directory, or symlink is never overwritten. If copying fails, the CLI removes only the incomplete directory created by that invocation.
+The destination's parent must exist. An existing file, directory, or symlink is never overwritten. If copying fails, the CLI attempts to remove only the incomplete directory created by that invocation and reports if cleanup also fails.
 
 The binary embeds the templates, so after it is built, project creation needs no Rust, Node.js, pnpm, source repository, or network. It copies the template configuration, lockfile, README, and `.env.example`, but does not install dependencies, initialize Git, rename packages, or add an ORM or plugins. Rebuild the binary after editing a template.
 
