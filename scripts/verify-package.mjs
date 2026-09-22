@@ -19,6 +19,8 @@ const files = new Map(report.files.map((file) => [file.path, file]));
 const required = [
   "package.json",
   "README.md",
+  "README.ja.md",
+  "README.ko.md",
   "bin/seed.mjs",
   "native/darwin-arm64/seed",
   "native/darwin-x64/seed",
@@ -35,6 +37,8 @@ for (const path of files.keys()) {
   assert(
     path === "package.json" ||
       path === "README.md" ||
+      path === "README.ja.md" ||
+      path === "README.ko.md" ||
       path.startsWith("bin/") ||
       path.startsWith("native/"),
     `npm package contains unexpected file ${path}`,
