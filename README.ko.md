@@ -32,27 +32,31 @@
 다음 예제는 최신 Apple silicon 릴리스를 `~/.local/bin`에 설치하고 체크섬을 검증한 다음 프로젝트를 생성합니다.
 
 ```sh
-gh auth login
-repo=sonsu-lee/templates
-tag="$(gh release view --repo "$repo" --json tagName --jq .tagName)"
-target=aarch64-apple-darwin
-asset="personal-template-${tag}-${target}.tar.gz"
-tmp="$(mktemp -d)"
-trap 'rm -rf "$tmp"' EXIT
-gh release download "$tag" --repo "$repo" --dir "$tmp" --pattern "$asset" --pattern "$asset.sha256"
-if command -v shasum >/dev/null; then
-  (cd "$tmp" && shasum -a 256 -c "$asset.sha256")
-else
-  (cd "$tmp" && sha256sum -c "$asset.sha256")
-fi
-tar -xzf "$tmp/$asset" -C "$tmp"
-mkdir -p "$HOME/.local/bin"
-install -m 755 "$tmp/personal-template" "$HOME/.local/bin/personal-template"
-personal-template --version
-personal-template create "$HOME/my-app" --template next
-cd "$HOME/my-app"
-pnpm install --frozen-lockfile
-pnpm dev
+(
+  set -eu
+  gh auth login
+  repo=sonsu-lee/templates
+  tag="$(gh release view --repo "$repo" --json tagName --jq .tagName)"
+  target=aarch64-apple-darwin
+  asset="personal-template-${tag}-${target}.tar.gz"
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' EXIT
+  gh release download "$tag" --repo "$repo" --dir "$tmp" --pattern "$asset" --pattern "$asset.sha256"
+  if command -v shasum >/dev/null; then
+    (cd "$tmp" && shasum -a 256 -c "$asset.sha256") || exit 1
+  else
+    (cd "$tmp" && sha256sum -c "$asset.sha256") || exit 1
+  fi
+  tar -xzf "$tmp/$asset" -C "$tmp"
+  mkdir -p "$HOME/.local/bin"
+  cli="$HOME/.local/bin/personal-template"
+  install -m 755 "$tmp/personal-template" "$cli"
+  "$cli" --version
+  "$cli" create "$HOME/my-app" --template next
+) &&
+  cd "$HOME/my-app" &&
+  pnpm install --frozen-lockfile &&
+  pnpm dev
 ```
 
 `~/.local/bin`이 `PATH`에 포함되어 있어야 합니다. 웹 앱은 <http://localhost:3000>에서 사용할 수 있습니다. 템플릿별 환경 및 배포 세부 정보는 생성된 README를 참조하세요. CLI를 업데이트하려면 다운로드와 설치 단계를 다시 실행하세요.

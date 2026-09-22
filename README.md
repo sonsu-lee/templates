@@ -32,27 +32,31 @@ Choose the target matching your machine:
 This example installs the latest Apple silicon release into `~/.local/bin`, verifies its checksum, and creates a project:
 
 ```sh
-gh auth login
-repo=sonsu-lee/templates
-tag="$(gh release view --repo "$repo" --json tagName --jq .tagName)"
-target=aarch64-apple-darwin
-asset="personal-template-${tag}-${target}.tar.gz"
-tmp="$(mktemp -d)"
-trap 'rm -rf "$tmp"' EXIT
-gh release download "$tag" --repo "$repo" --dir "$tmp" --pattern "$asset" --pattern "$asset.sha256"
-if command -v shasum >/dev/null; then
-  (cd "$tmp" && shasum -a 256 -c "$asset.sha256")
-else
-  (cd "$tmp" && sha256sum -c "$asset.sha256")
-fi
-tar -xzf "$tmp/$asset" -C "$tmp"
-mkdir -p "$HOME/.local/bin"
-install -m 755 "$tmp/personal-template" "$HOME/.local/bin/personal-template"
-personal-template --version
-personal-template create "$HOME/my-app" --template next
-cd "$HOME/my-app"
-pnpm install --frozen-lockfile
-pnpm dev
+(
+  set -eu
+  gh auth login
+  repo=sonsu-lee/templates
+  tag="$(gh release view --repo "$repo" --json tagName --jq .tagName)"
+  target=aarch64-apple-darwin
+  asset="personal-template-${tag}-${target}.tar.gz"
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' EXIT
+  gh release download "$tag" --repo "$repo" --dir "$tmp" --pattern "$asset" --pattern "$asset.sha256"
+  if command -v shasum >/dev/null; then
+    (cd "$tmp" && shasum -a 256 -c "$asset.sha256") || exit 1
+  else
+    (cd "$tmp" && sha256sum -c "$asset.sha256") || exit 1
+  fi
+  tar -xzf "$tmp/$asset" -C "$tmp"
+  mkdir -p "$HOME/.local/bin"
+  cli="$HOME/.local/bin/personal-template"
+  install -m 755 "$tmp/personal-template" "$cli"
+  "$cli" --version
+  "$cli" create "$HOME/my-app" --template next
+) &&
+  cd "$HOME/my-app" &&
+  pnpm install --frozen-lockfile &&
+  pnpm dev
 ```
 
 Ensure `~/.local/bin` is on `PATH`. The web app is available at <http://localhost:3000>. See the generated README for template-specific environment and deployment details. Run the download and install steps again to update the CLI.
