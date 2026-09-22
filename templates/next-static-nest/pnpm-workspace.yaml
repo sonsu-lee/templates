@@ -1,5 +1,7 @@
 saveExact: true
-autoInstallPeers: false
+peerDependencyRules:
+  ignoreMissing:
+    - '@nestjs/platform-express'
 
 packages:
   - apps/*
