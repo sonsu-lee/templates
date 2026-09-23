@@ -45,7 +45,7 @@ def main():
     def generate(name):
         destination = output / name
         run([str(output / "target/debug/sonsu"), "create", str(destination),
-             "--template", "next"])
+             "--template", "next-fullstack"])
         return destination
 
     try:

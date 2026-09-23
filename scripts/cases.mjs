@@ -4,14 +4,14 @@ import { join } from "node:path";
 import { readJson, safePath } from "./verification.mjs";
 
 export const templates = {
-  "next-fullstack": { flags: ["--template", "next"], web: ".", api: null },
+  "next-fullstack": { flags: ["--template", "next-fullstack"], web: ".", api: null },
   "next-node-nest": {
-    flags: ["--template", "next-nest", "--web", "node"],
+    flags: ["--template", "next-node-nest"],
     web: "apps/web",
     api: "apps/api",
   },
   "next-static-nest": {
-    flags: ["--template", "next-nest", "--web", "static"],
+    flags: ["--template", "next-static-nest"],
     web: "apps/web",
     api: "apps/api",
     static: true,

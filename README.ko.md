@@ -10,9 +10,9 @@
 
 | 템플릿 | 구성 | 배포 방식 | 선택 옵션 |
 | --- | --- | --- | --- |
-| [`next-fullstack`](templates/next-fullstack/README.md) | Next.js 앱 하나에서 UI와 API 제공 | Node 서버 하나 | `--template next` |
-| [`next-node-nest`](templates/next-node-nest/README.md) | 분리된 Next.js 웹 앱과 NestJS API 앱 | Node 서버 두 개 | `--template next-nest --web node` |
-| [`next-static-nest`](templates/next-static-nest/README.md) | Next.js 정적 웹 출력과 별도의 NestJS API | 웹은 정적 호스팅, API는 Node 서버 | `--template next-nest --web static` |
+| [`next-fullstack`](templates/next-fullstack/README.md) | Next.js 앱 하나에서 UI와 API 제공 | Node 서버 하나 | `--template next-fullstack` |
+| [`next-node-nest`](templates/next-node-nest/README.md) | 분리된 Next.js 웹 앱과 NestJS API 앱 | Node 서버 두 개 | `--template next-node-nest` |
+| [`next-static-nest`](templates/next-static-nest/README.md) | Next.js 정적 웹 출력과 별도의 NestJS API | 웹은 정적 호스팅, API는 Node 서버 | `--template next-static-nest` |
 
 서버 하나로 시작하려면 fullstack, 웹과 API를 별도 서버로 운영하려면 Node/Nest, 웹을 정적 파일로 호스팅하려면 static/Nest를 선택하세요. 배포 및 환경 설정은 생성된 프로젝트의 README를 참고하세요.
 
@@ -35,7 +35,7 @@ curl -fsSL https://raw.githubusercontent.com/sonsu-lee/templates/main/install.sh
 export PATH="$HOME/.local/bin:$PATH"
 sonsu --version
 sonsu templates
-sonsu create "$HOME/my-app" --template next
+sonsu create "$HOME/my-app" --template next-fullstack
 cd "$HOME/my-app"
 pnpm install --frozen-lockfile
 pnpm dev
@@ -50,12 +50,12 @@ pnpm dev
 ```sh
 sonsu templates
 sonsu create ../my-app
-sonsu create ../my-app --template next
-sonsu create ../my-service --template next-nest --web node
-sonsu create ../my-static --template next-nest --web static
+sonsu create ../my-app --template next-fullstack
+sonsu create ../my-service --template next-node-nest
+sonsu create ../my-static --template next-static-nest
 ```
 
-`sonsu templates`는 사용 가능한 템플릿을 나열하고, `sonsu create DEST`는 `DEST` 경로에 프로젝트를 생성합니다. `--template` 없이 `create`를 실행하면 터미널에서 아키텍처 선택 메뉴가 열립니다. Next.js + NestJS를 선택하면 웹 배포 방식(Node 서버 또는 정적 웹)을 묻는 두 번째 메뉴가 열립니다. 스크립트 등 비대화형 환경에서는 `--template`을 지정하세요. `--template next-nest`에 `--web`을 생략하면 Node가 선택됩니다. `--template next --web static` 조합은 지원하지 않습니다.
+`sonsu templates`는 세 가지 템플릿 ID와 설명을 나열하고, `sonsu create DEST --template ID`는 선택한 템플릿으로 `DEST`에 프로젝트를 생성합니다. 표준 입력과 표준 오류 출력이 모두 터미널일 때 `--template`을 생략하면 세 가지 선택지가 있는 단일 `Template` 메뉴가 열립니다. 화살표 키와 Enter로 선택하거나 Esc로 취소할 수 있습니다. 스크립트 등 비대화형 환경에서는 `--template`이 필수이며, 기본 템플릿은 없습니다.
 
 대상 경로의 부모 디렉터리는 이미 존재해야 하고 대상 경로는 없어야 합니다. `create`는 기존 파일이나 디렉터리를 덮어쓰지 않습니다. 템플릿은 `sonsu`에 내장되어 프로젝트 생성은 오프라인에서도 동작하지만, `pnpm install --frozen-lockfile`로 의존성을 설치하는 별도 단계에는 네트워크가 필요할 수 있습니다. 프로젝트 생성 시 Git 저장소를 초기화하지 않습니다.
 

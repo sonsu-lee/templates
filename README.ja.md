@@ -10,9 +10,9 @@
 
 | テンプレート | 構成 | デプロイ方法 | 選択オプション |
 | --- | --- | --- | --- |
-| [`next-fullstack`](templates/next-fullstack/README.md) | 1 つの Next.js アプリで UI と API を提供 | Node サーバー 1 台 | `--template next` |
-| [`next-node-nest`](templates/next-node-nest/README.md) | 分離した Next.js Web アプリと NestJS API アプリ | Node サーバー 2 台 | `--template next-nest --web node` |
-| [`next-static-nest`](templates/next-static-nest/README.md) | Next.js の静的 Web 出力と独立した NestJS API | Web は静的ホスト、API は Node サーバー | `--template next-nest --web static` |
+| [`next-fullstack`](templates/next-fullstack/README.md) | 1 つの Next.js アプリで UI と API を提供 | Node サーバー 1 台 | `--template next-fullstack` |
+| [`next-node-nest`](templates/next-node-nest/README.md) | 分離した Next.js Web アプリと NestJS API アプリ | Node サーバー 2 台 | `--template next-node-nest` |
+| [`next-static-nest`](templates/next-static-nest/README.md) | Next.js の静的 Web 出力と独立した NestJS API | Web は静的ホスト、API は Node サーバー | `--template next-static-nest` |
 
 サーバーを 1 つにまとめるなら fullstack、Web と API を別々のサーバーで動かすなら Node/Nest、Web を静的ファイルとして配信するなら static/Nest を選んでください。デプロイと環境設定は生成されたプロジェクトの README を参照してください。
 
@@ -35,7 +35,7 @@ curl -fsSL https://raw.githubusercontent.com/sonsu-lee/templates/main/install.sh
 export PATH="$HOME/.local/bin:$PATH"
 sonsu --version
 sonsu templates
-sonsu create "$HOME/my-app" --template next
+sonsu create "$HOME/my-app" --template next-fullstack
 cd "$HOME/my-app"
 pnpm install --frozen-lockfile
 pnpm dev
@@ -50,12 +50,12 @@ pnpm dev
 ```sh
 sonsu templates
 sonsu create ../my-app
-sonsu create ../my-app --template next
-sonsu create ../my-service --template next-nest --web node
-sonsu create ../my-static --template next-nest --web static
+sonsu create ../my-app --template next-fullstack
+sonsu create ../my-service --template next-node-nest
+sonsu create ../my-static --template next-static-nest
 ```
 
-`sonsu templates` は利用可能なテンプレートを一覧表示し、`sonsu create DEST` は `DEST` にプロジェクトを作成します。`--template` を指定しない `create` は、ターミナルで構成を選ぶ対話メニューを表示します。Next.js + NestJS を選ぶと、Web のデプロイ方法（Node サーバーまたは静的 Web）を選ぶ 2 つ目のメニューが表示されます。スクリプトなど非対話環境では `--template` を指定してください。`--template next-nest` で `--web` を省略すると Node が選ばれます。`--template next --web static` の組み合わせは使用できません。
+`sonsu templates` は 3 種類のテンプレート ID と説明を一覧表示し、`sonsu create DEST --template ID` は選択したテンプレートで `DEST` にプロジェクトを作成します。標準入力と標準エラー出力が両方ともターミナルの場合、`--template` を省略すると同じ 3 種類から選ぶ単一の `Template` メニューが表示されます。矢印キーと Enter で選択し、Esc でキャンセルできます。スクリプトなどの非対話環境では `--template` が必須で、既定のテンプレートはありません。
 
 作成先の親ディレクトリは既に存在する必要があり、作成先自体は存在してはいけません。`create` は既存のファイルやディレクトリを上書きしません。テンプレートは `sonsu` に組み込まれているため、プロジェクトの作成はオフラインでも可能です。ただし、別途行う `pnpm install --frozen-lockfile` にはネットワーク接続が必要になる場合があります。プロジェクト作成時に Git は初期化されません。
 

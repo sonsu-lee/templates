@@ -92,7 +92,7 @@ jobs:
           binary="target/${{ matrix.target }}/release/${{ matrix.executable }}"
           test "$("$binary" --version)" = "sonsu ${{ steps.metadata.outputs.version }} (source $SONSU_SOURCE_REVISION)"
           "$binary" templates
-          "$binary" create "$RUNNER_TEMP/generated" --template next
+          "$binary" create "$RUNNER_TEMP/generated" --template next-fullstack
           test -f "$RUNNER_TEMP/generated/package.json"
           test -f "$RUNNER_TEMP/generated/pnpm-lock.yaml"
       - name: Stage native binary
@@ -162,7 +162,7 @@ jobs:
           sonsu="$RUNNER_TEMP/sonsu-package/node_modules/.bin/sonsu"
           test "$("$sonsu" --version)" = "sonsu $(node -p 'require("./package.json").version') (source $GITHUB_SHA)"
           "$sonsu" templates
-          "$sonsu" create "$RUNNER_TEMP/generated-from-package" --template next
+          "$sonsu" create "$RUNNER_TEMP/generated-from-package" --template next-fullstack
           test -f "$RUNNER_TEMP/generated-from-package/package.json"
       - name: Upload npm package
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

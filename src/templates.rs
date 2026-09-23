@@ -16,3 +16,14 @@ impl Template {
         }
     }
 }
+
+impl std::fmt::Display for Template {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let description = match self {
+            Self::Fullstack => "Next.js UI and API in one Node server",
+            Self::NodeNest => "Next.js Node server + separate NestJS API",
+            Self::StaticNest => "Next.js static export + separate NestJS API",
+        };
+        write!(f, "{}  {description}", self.directory())
+    }
+}
