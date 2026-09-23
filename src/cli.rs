@@ -60,7 +60,7 @@ pub fn choose(template: Option<Template>) -> Result<Template, Failure> {
 fn prompt() -> Result<Template, Failure> {
     let selection = Select::new()
         .with_prompt("Template")
-        .items(&Template::ALL)
+        .items(Template::ALL)
         .default(0)
         .interact_opt()
         .map_err(|error| Failure::io(format!("Unable to read terminal selection: {error}")))?;
