@@ -6,7 +6,7 @@ mod error;
 mod templates;
 
 use clap::Parser;
-use cli::{Cli, Commands, TemplateCommands};
+use cli::{Cli, Commands};
 use error::Failure;
 use std::io::{self, Write};
 use std::process::ExitCode;
@@ -25,9 +25,8 @@ fn main() -> ExitCode {
 
 fn run(cli: Cli) -> Result<(), Failure> {
     let mut stdout = io::stdout().lock();
-    let Commands::Template { command } = cli.command;
-    match command {
-        TemplateCommands::List => {
+    match cli.command {
+        Commands::Templates => {
             for template in Template::ALL {
                 let options = match template {
                     Template::Fullstack => "--template next",
@@ -37,7 +36,7 @@ fn run(cli: Cli) -> Result<(), Failure> {
                 writeln!(stdout, "{}: {options}", template.directory())?;
             }
         }
-        TemplateCommands::Create {
+        Commands::Create {
             destination,
             template,
             web,

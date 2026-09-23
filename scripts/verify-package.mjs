@@ -21,12 +21,12 @@ const required = [
   "README.md",
   "README.ja.md",
   "README.ko.md",
-  "bin/seed.mjs",
-  "native/darwin-arm64/seed",
-  "native/darwin-x64/seed",
-  "native/linux-arm64/seed",
-  "native/linux-x64/seed",
-  "native/win32-x64/seed.exe",
+  "bin/sonsu.mjs",
+  "native/darwin-arm64/sonsu",
+  "native/darwin-x64/sonsu",
+  "native/linux-arm64/sonsu",
+  "native/linux-x64/sonsu",
+  "native/win32-x64/sonsu.exe",
 ];
 for (const path of required) {
   const file = files.get(path);

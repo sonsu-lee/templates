@@ -4,17 +4,17 @@ import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const targets = new Map([
-  ["darwin-arm64", "darwin-arm64/seed"],
-  ["darwin-x64", "darwin-x64/seed"],
-  ["linux-arm64", "linux-arm64/seed"],
-  ["linux-x64", "linux-x64/seed"],
-  ["win32-x64", "win32-x64/seed.exe"],
+  ["darwin-arm64", "darwin-arm64/sonsu"],
+  ["darwin-x64", "darwin-x64/sonsu"],
+  ["linux-arm64", "linux-arm64/sonsu"],
+  ["linux-x64", "linux-x64/sonsu"],
+  ["win32-x64", "win32-x64/sonsu.exe"],
 ]);
 
 const platform = `${process.platform}-${process.arch}`;
 const executable = targets.get(platform);
 if (executable === undefined) {
-  console.error(`seed does not support ${platform}`);
+  console.error(`sonsu does not support ${platform}`);
   process.exitCode = 1;
 } else {
   const binary = fileURLToPath(new URL(`../native/${executable}`, import.meta.url));
@@ -44,7 +44,7 @@ if (executable === undefined) {
   child.once("error", (error) => {
     removeSignalHandlers();
     spawnFailed = true;
-    console.error(`Unable to start seed for ${platform}: ${error.message}`);
+    console.error(`Unable to start sonsu for ${platform}: ${error.message}`);
     process.exitCode = 1;
   });
   child.once("exit", (code, signal) => {

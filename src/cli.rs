@@ -12,10 +12,10 @@ use crate::templates::Template;
     version = concat!(
         env!("CARGO_PKG_VERSION"),
         " (source ",
-        env!("SEED_SOURCE_REVISION"),
+        env!("SONSU_SOURCE_REVISION"),
         ")"
     ),
-    about = "Manage personal application projects and development workflows"
+    about = "Create projects from embedded Next.js templates"
 )]
 pub struct Cli {
     #[command(subcommand)]
@@ -24,17 +24,8 @@ pub struct Cli {
 
 #[derive(Subcommand, Debug)]
 pub enum Commands {
-    /// Work with embedded project templates
-    Template {
-        #[command(subcommand)]
-        command: TemplateCommands,
-    },
-}
-
-#[derive(Subcommand, Debug)]
-pub enum TemplateCommands {
     /// List available templates and their explicit selection options
-    List,
+    Templates,
     /// Copy a template into a new directory (its parent must already exist)
     Create {
         destination: PathBuf,

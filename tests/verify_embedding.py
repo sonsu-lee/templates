@@ -22,7 +22,7 @@ def main():
     else:
         parent = Path.home() / "tmp"
         parent.mkdir(exist_ok=True)
-        output = Path(tempfile.mkdtemp(prefix="seed-embedding.", dir=parent))
+        output = Path(tempfile.mkdtemp(prefix="sonsu-embedding.", dir=parent))
     checkout = output / "source"
     checkout.mkdir()
     report = {"directory": str(output), "commands": [], "status": "running"}
@@ -44,7 +44,7 @@ def main():
 
     def generate(name):
         destination = output / name
-        run([str(output / "target/debug/seed"), "template", "create", str(destination),
+        run([str(output / "target/debug/sonsu"), "create", str(destination),
              "--template", "next"])
         return destination
 

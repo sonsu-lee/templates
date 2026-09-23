@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Output, Stdio};
 
 fn binary() -> &'static str {
-    env!("CARGO_BIN_EXE_seed")
+    env!("CARGO_BIN_EXE_sonsu")
 }
 
 fn run(cwd: &Path, args: &[&str]) -> Output {
@@ -88,7 +88,7 @@ fn copies_all_three_templates_exactly() {
             vec!["--template", "next-nest", "--web", "static"],
         ),
     ] {
-        let mut command = vec!["template", "create", name];
+        let mut command = vec!["create", name];
         command.extend(args);
         let output = run(temp.path(), &command);
         assert_exit(&output, 0);
@@ -102,17 +102,15 @@ fn copies_all_three_templates_exactly() {
 #[test]
 fn lists_templates_and_help_without_writes() {
     let temp = tempfile::tempdir().unwrap();
-    for args in [
-        &["template", "list"][..],
-        &["--help"],
-        &["template", "--help"],
-        &["template", "create", "--help"],
-    ] {
+    for args in [&["templates"][..], &["--help"], &["create", "--help"]] {
         let output = run(temp.path(), args);
         assert_exit(&output, 0);
         assert!(!output.stdout.is_empty());
     }
-    let output = run(temp.path(), &["template", "list"]);
+    let help = String::from_utf8(run(temp.path(), &["--help"]).stdout).unwrap();
+    assert!(help.contains("templates"), "{help}");
+    assert!(help.contains("create"), "{help}");
+    let output = run(temp.path(), &["templates"]);
     let stdout = String::from_utf8(output.stdout).unwrap();
     for name in ["next-fullstack", "next-node-nest", "next-static-nest"] {
         assert!(stdout.contains(name));
@@ -128,9 +126,9 @@ fn version_identifies_the_package_and_embedded_source() {
     assert_eq!(
         String::from_utf8(output.stdout).unwrap(),
         format!(
-            "seed {} (source {})\n",
+            "sonsu {} (source {})\n",
             env!("CARGO_PKG_VERSION"),
-            env!("SEED_SOURCE_REVISION")
+            env!("SONSU_SOURCE_REVISION")
         )
     );
 }
@@ -139,10 +137,7 @@ fn version_identifies_the_package_and_embedded_source() {
 fn node_is_the_default_and_explicit_node_is_allowed_for_next() {
     let temp = tempfile::tempdir().unwrap();
     assert_exit(
-        &run(
-            temp.path(),
-            &["template", "create", "split", "--template", "next-nest"],
-        ),
+        &run(temp.path(), &["create", "split", "--template", "next-nest"]),
         0,
     );
     assert_eq!(
@@ -152,15 +147,7 @@ fn node_is_the_default_and_explicit_node_is_allowed_for_next() {
     assert_exit(
         &run(
             temp.path(),
-            &[
-                "template",
-                "create",
-                "full",
-                "--template",
-                "next",
-                "--web",
-                "node",
-            ],
+            &["create", "full", "--template", "next", "--web", "node"],
         ),
         0,
     );
@@ -174,59 +161,28 @@ fn node_is_the_default_and_explicit_node_is_allowed_for_next() {
 fn invalid_arguments_fail_before_writing() {
     let temp = tempfile::tempdir().unwrap();
     for (args, diagnostic) in [
-        (vec!["template", "create", "out"], "--template"),
+        (vec!["create", "out"], "--template"),
+        (vec!["create", "out", "--web", "static"], "--template"),
         (
-            vec!["template", "create", "out", "--web", "static"],
-            "--template",
-        ),
-        (
-            vec![
-                "template",
-                "create",
-                "out",
-                "--template",
-                "next",
-                "--web",
-                "static",
-            ],
+            vec!["create", "out", "--template", "next", "--web", "static"],
             "static",
         ),
         (
-            vec!["template", "create", "out", "--template", "unknown"],
+            vec!["create", "out", "--template", "unknown"],
             "invalid value",
         ),
         (
-            vec![
-                "template",
-                "create",
-                "out",
-                "--template",
-                "next",
-                "--web",
-                "unknown",
-            ],
+            vec!["create", "out", "--template", "next", "--web", "unknown"],
             "invalid value",
         ),
-        (vec!["template", "create", "out", "--template"], "value"),
+        (vec!["create", "out", "--template"], "value"),
+        (vec!["create", "--template", "next"], "DESTINATION"),
         (
-            vec!["template", "create", "--template", "next"],
-            "DESTINATION",
-        ),
-        (
-            vec![
-                "template",
-                "create",
-                "out",
-                "--template",
-                "next",
-                "--template",
-                "next",
-            ],
+            vec!["create", "out", "--template", "next", "--template", "next"],
             "multiple times",
         ),
         (
             vec![
-                "template",
                 "create",
                 "out",
                 "--template",
@@ -238,10 +194,7 @@ fn invalid_arguments_fail_before_writing() {
             ],
             "multiple times",
         ),
-        (
-            vec!["template", "create", "out", "--typo"],
-            "unexpected argument",
-        ),
+        (vec!["create", "out", "--typo"], "unexpected argument"),
     ] {
         let output = run(temp.path(), &args);
         assert_exit(&output, 2);
@@ -249,6 +202,14 @@ fn invalid_arguments_fail_before_writing() {
             String::from_utf8_lossy(&output.stderr).contains(diagnostic),
             "{args:?}: {output:?}"
         );
+        assert_eq!(fs::read_dir(temp.path()).unwrap().count(), 0);
+    }
+    for args in [
+        &["template", "list"][..],
+        &["template", "create", "out", "--template", "next"],
+    ] {
+        let output = run(temp.path(), args);
+        assert_exit(&output, 2);
         assert_eq!(fs::read_dir(temp.path()).unwrap().count(), 0);
     }
 }
@@ -262,10 +223,7 @@ fn existing_files_and_directories_are_preserved() {
     fs::write(temp.path().join("full/keep"), "untouched").unwrap();
     let before = tree(temp.path());
     for name in ["file", "empty", "full"] {
-        let output = run(
-            temp.path(),
-            &["template", "create", name, "--template", "next"],
-        );
+        let output = run(temp.path(), &["create", name, "--template", "next"]);
         assert_exit(&output, 1);
         assert!(String::from_utf8_lossy(&output.stderr).contains("already exists"));
         assert_eq!(tree(temp.path()), before);
@@ -282,10 +240,7 @@ fn existing_symlinks_including_dangling_links_are_preserved() {
     fs::write(temp.path().join("real/keep"), "keep").unwrap();
     for (name, target) in [("valid", "real"), ("dangling", "absent")] {
         symlink(target, temp.path().join(name)).unwrap();
-        let output = run(
-            temp.path(),
-            &["template", "create", name, "--template", "next"],
-        );
+        let output = run(temp.path(), &["create", name, "--template", "next"]);
         assert_exit(&output, 1);
         assert!(String::from_utf8_lossy(&output.stderr).contains("already exists"));
         assert_eq!(
@@ -302,10 +257,7 @@ fn missing_or_non_directory_parent_is_not_created_or_modified() {
     let temp = tempfile::tempdir().unwrap();
     fs::write(temp.path().join("file"), "keep").unwrap();
     for name in ["missing/app", "file/app"] {
-        let output = run(
-            temp.path(),
-            &["template", "create", name, "--template", "next"],
-        );
+        let output = run(temp.path(), &["create", name, "--template", "next"]);
         assert_exit(&output, 1);
         assert!(String::from_utf8_lossy(&output.stderr).contains("parent"));
     }
@@ -321,7 +273,7 @@ fn concurrent_creates_have_one_winner_and_a_complete_result() {
         children.push(
             Command::new(binary())
                 .current_dir(temp.path())
-                .args(["template", "create", "same", "--template", "next"])
+                .args(["create", "same", "--template", "next"])
                 .stdin(Stdio::null())
                 .stdout(Stdio::piped())
                 .stderr(Stdio::piped())
