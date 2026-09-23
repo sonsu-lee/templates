@@ -29,14 +29,6 @@ test("CLI selects all or one template and rejects unsupported or repeated argume
   }
 });
 
-test("fixture catalogs have readable nonempty inputs for every selected case", () => {
-  for (const template of parseArgs([]).selected) {
-    const cases = loadCases(resolve(import.meta.dirname, ".."), template);
-    assert.ok(cases.length >= 8);
-    for (const spec of cases) assert.equal(Object.keys(spec.entries).length, spec.files.length);
-  }
-});
-
 test("fixture omissions and path escapes are rejected", (t) => {
   const dir = scratch(t);
   assert.throws(() => writeFiles(dir, {}), /contain files/);

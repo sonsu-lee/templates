@@ -2,10 +2,10 @@
 set -eu
 
 repository="sonsu-lee/templates"
-version="${SEED_VERSION:-latest}"
+version="${SONSU_VERSION:-latest}"
 
 fail() {
-  printf 'seed installer: %s\n' "$1" >&2
+  printf 'sonsu installer: %s\n' "$1" >&2
   exit 1
 }
 
@@ -25,27 +25,27 @@ case "$(uname -m)" in
   *) fail "unsupported architecture: $(uname -m)" ;;
 esac
 
-archive="seed-${platform}-${architecture}.tar.gz"
-if [ -n "${SEED_RELEASE_BASE_URL:-}" ]; then
-  release_base="${SEED_RELEASE_BASE_URL%/}"
+archive="sonsu-${platform}-${architecture}.tar.gz"
+if [ -n "${SONSU_RELEASE_BASE_URL:-}" ]; then
+  release_base="${SONSU_RELEASE_BASE_URL%/}"
 elif [ "$version" = "latest" ]; then
   release_base="https://github.com/${repository}/releases/latest/download"
 else
   case "$version" in
     v[0-9]*.[0-9]*.[0-9]*) ;;
-    *) fail "SEED_VERSION must be latest or a tag such as v0.1.1" ;;
+    *) fail "SONSU_VERSION must be latest or a tag such as v0.2.0" ;;
   esac
   release_base="https://github.com/${repository}/releases/download/${version}"
 fi
 
-if [ -n "${SEED_INSTALL_DIR:-}" ]; then
-  install_dir="$SEED_INSTALL_DIR"
+if [ -n "${SONSU_INSTALL_DIR:-}" ]; then
+  install_dir="$SONSU_INSTALL_DIR"
 else
-  [ -n "${HOME:-}" ] || fail "HOME is unset; set SEED_INSTALL_DIR explicitly"
+  [ -n "${HOME:-}" ] || fail "HOME is unset; set SONSU_INSTALL_DIR explicitly"
   install_dir="$HOME/.local/bin"
 fi
 
-temporary_dir="$(mktemp -d "${TMPDIR:-/tmp}/seed-install.XXXXXX")"
+temporary_dir="$(mktemp -d "${TMPDIR:-/tmp}/sonsu-install.XXXXXX")"
 temporary_binary=""
 cleanup() {
   rm -rf "$temporary_dir"
@@ -73,18 +73,18 @@ fi
 
 mkdir -p "$temporary_dir/extracted"
 tar -xzf "$temporary_dir/$archive" -C "$temporary_dir/extracted"
-[ -f "$temporary_dir/extracted/seed" ] || fail "$archive does not contain seed"
+[ -f "$temporary_dir/extracted/sonsu" ] || fail "$archive does not contain sonsu"
 
 mkdir -p "$install_dir"
-temporary_binary="$install_dir/.seed.$$"
-cp "$temporary_dir/extracted/seed" "$temporary_binary"
+temporary_binary="$install_dir/.sonsu.$$"
+cp "$temporary_dir/extracted/sonsu" "$temporary_binary"
 chmod 755 "$temporary_binary"
-mv "$temporary_binary" "$install_dir/seed"
+mv "$temporary_binary" "$install_dir/sonsu"
 temporary_binary=""
 
-"$install_dir/seed" --version
-printf 'Installed seed to %s\n' "$install_dir/seed"
+"$install_dir/sonsu" --version
+printf 'Installed sonsu to %s\n' "$install_dir/sonsu"
 case ":${PATH:-}:" in
   *":$install_dir:"*) ;;
-  *) printf 'Add %s to PATH to run seed directly.\n' "$install_dir" ;;
+  *) printf 'Add %s to PATH to run sonsu directly.\n' "$install_dir" ;;
 esac
