@@ -2,7 +2,7 @@
 
 [English](README.md) | [한국어](README.ko.md) | **日本語**
 
-`seed` CLI を使い、組み込み済みの 3 種類の Next.js テンプレートから個人用アプリケーションプロジェクトを作成します。
+`seed` は、組み込み済みの 3 種類の Next.js テンプレートから個人用アプリケーションを作成するスタンドアロン CLI です。単一の Next.js アプリケーション、または Next.js Web と NestJS API で構成されるアプリケーションを選択できます。
 
 ## テンプレート
 
@@ -14,23 +14,32 @@
 
 ## 必要条件
 
-インストーラーは arm64 と x64 の macOS 15 および Ubuntu 24.04 をサポートし、`curl` と `tar` を使用します。生成されたプロジェクトには Node.js 24 以降と pnpm 12.3.4 が必要です。Windows x64 バイナリは GitHub Releases から入手できます。
-
-Rust stable、`rustfmt`、Clippy は開発時にのみ必要です。
+- `seed` のインストール: arm64 または x64 の macOS 15 / Ubuntu 24.04、および `curl` と `tar`。Windows x64 ユーザーは [GitHub Releases](https://github.com/sonsu-lee/templates/releases/latest) から実行ファイルをダウンロードできます。
+- 生成したプロジェクトの実行: Node.js 24 以降と pnpm 12.3.4。
+- `seed` の開発: `rustfmt` と Clippy を含む Rust stable。
 
 ## クイックスタート
+
+### `seed` のインストール
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/sonsu-lee/templates/main/install.sh | sh
 export PATH="$HOME/.local/bin:$PATH"
 seed --version
+```
+
+インストーラーはリリースのチェックサムを検証してから `$HOME/.local/bin` に `seed` をインストールします。常に `PATH` から実行できるようにするには、`export` の行をシェルプロファイルに追加してください。更新するにはインストーラーを再実行し、特定のリリースをインストールするには `curl -fsSL https://raw.githubusercontent.com/sonsu-lee/templates/main/install.sh | SEED_VERSION=v0.1.1 sh` を使用してください。
+
+### プロジェクトの作成
+
+```sh
 seed template create "$HOME/my-app" --template next
 cd "$HOME/my-app"
 pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-<http://localhost:3000> を開いてください。`seed` を更新するにはインストーラーを再実行します。特定のリリースをインストールするには、`curl -fsSL https://raw.githubusercontent.com/sonsu-lee/templates/main/install.sh | SEED_VERSION=v0.1.1 sh` を使用してください。
+<http://localhost:3000> を開いてください。環境変数とデプロイ方法は、生成されたプロジェクトの README に記載されています。
 
 ## CLI の使い方
 

@@ -2,7 +2,7 @@
 
 **English** | [한국어](README.ko.md) | [日本語](README.ja.md)
 
-Create personal application projects from three embedded Next.js templates with the `seed` CLI.
+`seed` is a standalone CLI for creating personal applications from three embedded Next.js templates. Choose a single Next.js application or a Next.js web application with a NestJS API.
 
 ## Templates
 
@@ -14,23 +14,32 @@ Create personal application projects from three embedded Next.js templates with 
 
 ## Requirements
 
-The installer supports macOS 15 and Ubuntu 24.04 on arm64 and x64, and requires `curl` and `tar`. Generated projects require Node.js 24 or newer and pnpm 12.3.4. A Windows x64 binary is available from GitHub Releases.
-
-Rust stable, `rustfmt`, and Clippy are needed only for development.
+- Installing `seed`: macOS 15 or Ubuntu 24.04 on arm64 or x64, with `curl` and `tar`. Windows x64 users can download the executable from [GitHub Releases](https://github.com/sonsu-lee/templates/releases/latest).
+- Running a generated project: Node.js 24 or newer and pnpm 12.3.4.
+- Developing `seed`: Rust stable with `rustfmt` and Clippy.
 
 ## Quick Start
+
+### Install `seed`
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/sonsu-lee/templates/main/install.sh | sh
 export PATH="$HOME/.local/bin:$PATH"
 seed --version
+```
+
+The installer verifies the release checksum and installs `seed` to `$HOME/.local/bin`. Add the `export` line to your shell profile to keep it on `PATH`. Rerun the installer to update, or install a specific release with `curl -fsSL https://raw.githubusercontent.com/sonsu-lee/templates/main/install.sh | SEED_VERSION=v0.1.1 sh`.
+
+### Create a project
+
+```sh
 seed template create "$HOME/my-app" --template next
 cd "$HOME/my-app"
 pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open <http://localhost:3000>. Rerun the installer to update `seed`. To pin a release, use `curl -fsSL https://raw.githubusercontent.com/sonsu-lee/templates/main/install.sh | SEED_VERSION=v0.1.1 sh`.
+Open <http://localhost:3000>. Environment variables and deployment instructions are documented in the generated project's README.
 
 ## CLI Usage
 
