@@ -11,6 +11,8 @@ fn run(cwd: &Path, args: &[&str]) -> Output {
     Command::new(binary())
         .current_dir(cwd)
         .args(args)
+        // Project creation must not need git, pnpm, curl, or other commands on PATH.
+        .env("PATH", "")
         .stdin(Stdio::null())
         .output()
         .unwrap()
