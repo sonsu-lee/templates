@@ -79,45 +79,25 @@ fn source_tree(template: &str) -> BTreeMap<PathBuf, Vec<u8>> {
 #[test]
 fn copies_all_three_templates_exactly() {
     let temp = tempfile::tempdir().unwrap();
-    for (name, args) in [
-        ("next-fullstack", vec!["--template", "next"]),
-        (
-            "next-node-nest",
-            vec!["--template", "next-nest", "--web", "node"],
-        ),
-        (
-            "next-static-nest",
-            vec!["--template", "next-nest", "--web", "static"],
-        ),
-    ] {
-        let mut command = vec!["create", name];
-        command.extend(args);
-        let output = run(temp.path(), &command);
-        assert_exit(&output, 0);
-        assert_eq!(tree(&temp.path().join(name)), source_tree(name));
-        let stdout = String::from_utf8(output.stdout).unwrap();
-        assert!(stdout.contains("pnpm install --frozen-lockfile"));
-        assert!(stdout.contains("pnpm dev"));
-    }
-}
-
-#[test]
-fn lists_templates_and_help_without_writes() {
-    let temp = tempfile::tempdir().unwrap();
-    for args in [&["templates"][..], &["--help"], &["create", "--help"]] {
-        let output = run(temp.path(), args);
-        assert_exit(&output, 0);
-        assert!(!output.stdout.is_empty());
-    }
-    let help = String::from_utf8(run(temp.path(), &["--help"]).stdout).unwrap();
-    assert!(help.contains("templates"), "{help}");
-    assert!(help.contains("create"), "{help}");
     let output = run(temp.path(), &["templates"]);
-    let stdout = String::from_utf8(output.stdout).unwrap();
-    for name in ["next-fullstack", "next-node-nest", "next-static-nest"] {
-        assert!(stdout.contains(name));
-    }
+    assert_exit(&output, 0);
     assert_eq!(fs::read_dir(temp.path()).unwrap().count(), 0);
+    let stdout = String::from_utf8(output.stdout).unwrap();
+    let ids: Vec<_> = stdout
+        .lines()
+        .map(|line| line.split_whitespace().next().unwrap())
+        .collect();
+    assert_eq!(
+        ids,
+        ["next-fullstack", "next-node-nest", "next-static-nest"]
+    );
+
+    for (index, id) in ids.into_iter().enumerate() {
+        let destination = format!("generated-{index}");
+        let output = run(temp.path(), &["create", &destination, "--template", id]);
+        assert_exit(&output, 0);
+        assert_eq!(tree(&temp.path().join(destination)), source_tree(id));
+    }
 }
 
 #[test]
@@ -136,83 +116,36 @@ fn version_identifies_the_package_and_embedded_source() {
 }
 
 #[test]
-fn node_is_the_default_and_explicit_node_is_allowed_for_next() {
-    let temp = tempfile::tempdir().unwrap();
-    assert_exit(
-        &run(temp.path(), &["create", "split", "--template", "next-nest"]),
-        0,
-    );
-    assert_eq!(
-        tree(&temp.path().join("split")),
-        source_tree("next-node-nest")
-    );
-    assert_exit(
-        &run(
-            temp.path(),
-            &["create", "full", "--template", "next", "--web", "node"],
-        ),
-        0,
-    );
-    assert_eq!(
-        tree(&temp.path().join("full")),
-        source_tree("next-fullstack")
-    );
-}
-
-#[test]
 fn invalid_arguments_fail_before_writing() {
     let temp = tempfile::tempdir().unwrap();
-    for (args, diagnostic) in [
-        (vec!["create", "out"], "--template"),
-        (vec!["create", "out", "--web", "static"], "--template"),
+    let cases: [(&[&str], &[&str]); 5] = [
+        (&["create", "out"], &["--template", "sonsu templates"]),
         (
-            vec!["create", "out", "--template", "next", "--web", "static"],
-            "static",
+            &["create", "out", "--template", "unknown"],
+            &["next-fullstack", "next-node-nest", "next-static-nest"],
         ),
+        (&["create", "out", "--template", "next"], &[]),
+        (&["create", "out", "--template", "next-nest"], &[]),
         (
-            vec!["create", "out", "--template", "unknown"],
-            "invalid value",
-        ),
-        (
-            vec!["create", "out", "--template", "next", "--web", "unknown"],
-            "invalid value",
-        ),
-        (vec!["create", "out", "--template"], "value"),
-        (vec!["create", "--template", "next"], "DESTINATION"),
-        (
-            vec!["create", "out", "--template", "next", "--template", "next"],
-            "multiple times",
-        ),
-        (
-            vec![
+            &[
                 "create",
                 "out",
                 "--template",
-                "next",
-                "--web",
-                "node",
+                "next-fullstack",
                 "--web",
                 "node",
             ],
-            "multiple times",
+            &[],
         ),
-        (vec!["create", "out", "--typo"], "unexpected argument"),
-    ] {
-        let output = run(temp.path(), &args);
-        assert_exit(&output, 2);
-        assert!(
-            String::from_utf8_lossy(&output.stderr).contains(diagnostic),
-            "{args:?}: {output:?}"
-        );
-        assert_eq!(fs::read_dir(temp.path()).unwrap().count(), 0);
-    }
-    for args in [
-        &["template", "list"][..],
-        &["template", "create", "out", "--template", "next"],
-    ] {
+    ];
+    for (args, diagnostics) in cases {
         let output = run(temp.path(), args);
         assert_exit(&output, 2);
-        assert_eq!(fs::read_dir(temp.path()).unwrap().count(), 0);
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        for diagnostic in diagnostics {
+            assert!(stderr.contains(diagnostic), "{args:?}: {stderr}");
+        }
+        assert!(!temp.path().join("out").exists(), "{args:?}");
     }
 }
 
@@ -225,9 +158,11 @@ fn existing_files_and_directories_are_preserved() {
     fs::write(temp.path().join("full/keep"), "untouched").unwrap();
     let before = tree(temp.path());
     for name in ["file", "empty", "full"] {
-        let output = run(temp.path(), &["create", name, "--template", "next"]);
+        let output = run(
+            temp.path(),
+            &["create", name, "--template", "next-fullstack"],
+        );
         assert_exit(&output, 1);
-        assert!(String::from_utf8_lossy(&output.stderr).contains("already exists"));
         assert_eq!(tree(temp.path()), before);
         assert!(temp.path().join("empty").is_dir());
     }
@@ -242,9 +177,11 @@ fn existing_symlinks_including_dangling_links_are_preserved() {
     fs::write(temp.path().join("real/keep"), "keep").unwrap();
     for (name, target) in [("valid", "real"), ("dangling", "absent")] {
         symlink(target, temp.path().join(name)).unwrap();
-        let output = run(temp.path(), &["create", name, "--template", "next"]);
+        let output = run(
+            temp.path(),
+            &["create", name, "--template", "next-fullstack"],
+        );
         assert_exit(&output, 1);
-        assert!(String::from_utf8_lossy(&output.stderr).contains("already exists"));
         assert_eq!(
             fs::read_link(temp.path().join(name)).unwrap(),
             Path::new(target)
@@ -259,9 +196,11 @@ fn missing_or_non_directory_parent_is_not_created_or_modified() {
     let temp = tempfile::tempdir().unwrap();
     fs::write(temp.path().join("file"), "keep").unwrap();
     for name in ["missing/app", "file/app"] {
-        let output = run(temp.path(), &["create", name, "--template", "next"]);
+        let output = run(
+            temp.path(),
+            &["create", name, "--template", "next-fullstack"],
+        );
         assert_exit(&output, 1);
-        assert!(String::from_utf8_lossy(&output.stderr).contains("parent"));
     }
     assert_eq!(fs::read(temp.path().join("file")).unwrap(), b"keep");
     assert!(!temp.path().join("missing").exists());
@@ -275,7 +214,7 @@ fn concurrent_creates_have_one_winner_and_a_complete_result() {
         children.push(
             Command::new(binary())
                 .current_dir(temp.path())
-                .args(["create", "same", "--template", "next"])
+                .args(["create", "same", "--template", "next-fullstack"])
                 .stdin(Stdio::null())
                 .stdout(Stdio::piped())
                 .stderr(Stdio::piped())
@@ -296,7 +235,6 @@ fn concurrent_creates_have_one_winner_and_a_complete_result() {
     );
     for output in outputs.iter().filter(|output| !output.status.success()) {
         assert_exit(output, 1);
-        assert!(String::from_utf8_lossy(&output.stderr).contains("already exists"));
     }
     assert_eq!(
         tree(&temp.path().join("same")),

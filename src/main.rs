@@ -28,20 +28,14 @@ fn run(cli: Cli) -> Result<(), Failure> {
     match cli.command {
         Commands::Templates => {
             for template in Template::ALL {
-                let options = match template {
-                    Template::Fullstack => "--template next",
-                    Template::NodeNest => "--template next-nest --web node (default web)",
-                    Template::StaticNest => "--template next-nest --web static",
-                };
-                writeln!(stdout, "{}: {options}", template.directory())?;
+                writeln!(stdout, "{template}")?;
             }
         }
         Commands::Create {
             destination,
             template,
-            web,
         } => {
-            let template = cli::choose(template, web)?;
+            let template = cli::choose(template)?;
             let destination = create::create(&destination, template)?;
             writeln!(
                 stdout,

@@ -10,9 +10,9 @@ Run `sonsu templates` to list the available choices; use `sonsu create DEST` to 
 
 | Template | What you get | Deployment | Selection |
 | --- | --- | --- | --- |
-| [`next-fullstack`](templates/next-fullstack/README.md) | One Next.js app serves the UI and API | Node server | `--template next` |
-| [`next-node-nest`](templates/next-node-nest/README.md) | Separate Next.js web and NestJS API apps | Two Node servers | `--template next-nest --web node` |
-| [`next-static-nest`](templates/next-static-nest/README.md) | Next.js static web export and a separate NestJS API | Static host for web, Node server for API | `--template next-nest --web static` |
+| [`next-fullstack`](templates/next-fullstack/README.md) | One Next.js app serves the UI and API | Node server | `--template next-fullstack` |
+| [`next-node-nest`](templates/next-node-nest/README.md) | Separate Next.js web and NestJS API apps | Two Node servers | `--template next-node-nest` |
+| [`next-static-nest`](templates/next-static-nest/README.md) | Next.js static web export and a separate NestJS API | Static host for web, Node server for API | `--template next-static-nest` |
 
 Use the fullstack template for one server, the Node/Nest template when the web and API need separate servers, or the static/Nest template when the web must be hosted as static files. See each generated README for deployment and environment settings.
 
@@ -35,7 +35,7 @@ curl -fsSL https://raw.githubusercontent.com/sonsu-lee/templates/main/install.sh
 export PATH="$HOME/.local/bin:$PATH"
 sonsu --version
 sonsu templates
-sonsu create "$HOME/my-app" --template next
+sonsu create "$HOME/my-app" --template next-fullstack
 cd "$HOME/my-app"
 pnpm install --frozen-lockfile
 pnpm dev
@@ -50,12 +50,12 @@ To update after a newer release is published, rerun the installer without `SONSU
 ```sh
 sonsu templates
 sonsu create ../my-app
-sonsu create ../my-app --template next
-sonsu create ../my-service --template next-nest --web node
-sonsu create ../my-static --template next-nest --web static
+sonsu create ../my-app --template next-fullstack
+sonsu create ../my-service --template next-node-nest
+sonsu create ../my-static --template next-static-nest
 ```
 
-`sonsu templates` lists the available templates; `sonsu create DEST` generates a project at `DEST`. The `create` form without `--template` opens an interactive architecture menu in a terminal. Choosing Next.js + NestJS opens a second menu for Node server or static web deployment. For scripts and other non-interactive use, pass `--template`; `--template next-nest` without `--web` selects Node. `--template next --web static` is not supported.
+`sonsu templates` lists the three template IDs and descriptions; `sonsu create DEST --template ID` generates the selected project at `DEST`. When both stdin and stderr are terminals, omitting `--template` opens one `Template` menu with the same three choices; use the arrow keys and Enter to select one, or Esc to cancel. For scripts and other non-interactive use, `--template` is required: there is no default template.
 
 The destination's parent must already exist, and the destination itself must not exist: `create` never overwrites a file or directory. Templates are embedded in `sonsu`, so creating a project works offline; installing its dependencies with `pnpm install --frozen-lockfile` is a separate step that may require network access. Project creation does not initialize Git.
 
