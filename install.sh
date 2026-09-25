@@ -31,10 +31,9 @@ if [ -n "${SONSU_RELEASE_BASE_URL:-}" ]; then
 elif [ "$version" = "latest" ]; then
   release_base="https://github.com/${repository}/releases/latest/download"
 else
-  case "$version" in
-    v[0-9]*.[0-9]*.[0-9]*) ;;
-    *) fail "SONSU_VERSION must be latest or a tag such as v0.2.0" ;;
-  esac
+  printf '%s\n' "$version" |
+    awk 'NR != 1 || $0 !~ /^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$/ { exit 1 }' ||
+    fail "SONSU_VERSION must be latest or a valid version tag"
   release_base="https://github.com/${repository}/releases/download/${version}"
 fi
 
@@ -53,7 +52,8 @@ cleanup() {
     rm -f "$temporary_binary"
   fi
 }
-trap cleanup EXIT HUP INT TERM
+trap cleanup EXIT
+trap 'exit 1' HUP INT TERM
 
 curl -fsSL "$release_base/$archive" -o "$temporary_dir/$archive"
 curl -fsSL "$release_base/SHA256SUMS" -o "$temporary_dir/SHA256SUMS"
@@ -74,6 +74,7 @@ fi
 mkdir -p "$temporary_dir/extracted"
 tar -xzf "$temporary_dir/$archive" -C "$temporary_dir/extracted"
 [ -f "$temporary_dir/extracted/sonsu" ] || fail "$archive does not contain sonsu"
+"$temporary_dir/extracted/sonsu" --version
 
 mkdir -p "$install_dir"
 temporary_binary="$install_dir/.sonsu.$$"
@@ -81,8 +82,6 @@ cp "$temporary_dir/extracted/sonsu" "$temporary_binary"
 chmod 755 "$temporary_binary"
 mv "$temporary_binary" "$install_dir/sonsu"
 temporary_binary=""
-
-"$install_dir/sonsu" --version
 printf 'Installed sonsu to %s\n' "$install_dir/sonsu"
 case ":${PATH:-}:" in
   *":$install_dir:"*) ;;
