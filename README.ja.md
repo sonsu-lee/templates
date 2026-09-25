@@ -31,7 +31,7 @@
 `v0.2.0` が公開された後、対応する macOS または Ubuntu で実行してください。
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/sonsu-lee/templates/main/install.sh | SONSU_VERSION=v0.2.0 sh
+curl -fsSL https://sonsu.dev/install | SONSU_VERSION=v0.2.0 sh
 export PATH="$HOME/.local/bin:$PATH"
 sonsu --version
 sonsu templates

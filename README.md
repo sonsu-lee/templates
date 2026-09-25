@@ -31,7 +31,7 @@ The rename is a breaking change, not an alias: installing `sonsu` does not remov
 On supported macOS or Ubuntu, after the `v0.2.0` release is available:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/sonsu-lee/templates/main/install.sh | SONSU_VERSION=v0.2.0 sh
+curl -fsSL https://sonsu.dev/install | SONSU_VERSION=v0.2.0 sh
 export PATH="$HOME/.local/bin:$PATH"
 sonsu --version
 sonsu templates
